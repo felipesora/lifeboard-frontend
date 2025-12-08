@@ -1,4 +1,4 @@
-import type { MetaResponse } from "../types/meta";
+import type { MetaCreateDTO, MetaEditDTO, MetaResponse } from "../types/meta";
 import { obterDadosUsuario } from "./usuarioService";
 
 export async function obterDadosMeta(id: number): Promise<MetaResponse> {
@@ -17,11 +17,11 @@ export async function obterDadosMeta(id: number): Promise<MetaResponse> {
     return await response.json();
 }
 
-export async function cadastrarMeta(meta) {
+export async function cadastrarMeta(meta: MetaCreateDTO): Promise<void> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
-    const usuario = await obterDadosUsuario(idUser);
+    const usuario = await obterDadosUsuario(Number(idUser));
 
     const idFinanceiro = usuario.financeiro.id_financeiro;
 
@@ -98,7 +98,7 @@ export async function retirarSaldo(id: number, valor: number): Promise<void> {
     return;
 }
 
-export async function editarDadosMeta(idMeta, novaMeta) {
+export async function editarDadosMeta(idMeta: number, novaMeta: MetaEditDTO): Promise<void> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/metas/${idMeta}`, {

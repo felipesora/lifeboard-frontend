@@ -1,31 +1,31 @@
-import "./EditarMeta.css"
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthRedirect } from "../../hooks/useAuthRedirect";
 import MenuLateral from "../../components/MenuLateral";
 import { useEffect, useState } from "react";
 import { editarDadosMeta, obterDadosMeta } from "../../services/metaService";
 import Cabecalho from "../../components/Cabecalho";
+import { BotaoAcao, BotoesContainer, CadastroMetasContainer, CadastroMetasForm, DashBoardContainer, DashboardMainCadastroMetas, InputDataLimite, InputField, InputLabel, InputNomeMeta, InputsContainer, InputValorMeta, MensagemErro, MensagemSucesso, MensagensContainer } from "./styles";
 
 const EditarMeta = () => {
     useAuthRedirect();
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const [nomeMeta, setNomeMeta] = useState('');
-    const [dataLimiteMeta, setDataLimiteMeta] = useState('');
+    const [nomeMeta, setNomeMeta] = useState<string>('');
+    const [dataLimiteMeta, setDataLimiteMeta] = useState<string>('');
     const [valorMeta, setValorMeta] = useState('');
-    const [statusMeta, setStatusMeta] = useState('');
-    const [idFinanceiro, setIdFinanceiro] = useState('');
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [statusMeta, setStatusMeta] = useState<"EM_ANDAMENTO" | "CONCLUIDA" | "CANCELADA">("EM_ANDAMENTO");
+    const [idFinanceiro, setIdFinanceiro] = useState<number | null>(null);
+    const [error, setError] = useState<string>("");
+    const [success, setSuccess] = useState<string>("");
 
     useEffect(() => {
         const fetchMeta = async () => {
             try {
-                const dados = await obterDadosMeta(id);
+                const dados = await obterDadosMeta(Number(id));
                 setNomeMeta(dados.nome);
                 setDataLimiteMeta(dados.data_limite);
-                setValorMeta(dados.valor_meta);
+                setValorMeta(String(dados.valor_meta));
                 setStatusMeta(dados.status)
                 setIdFinanceiro(dados.id_financeiro);
             } catch (erro) {
@@ -70,12 +70,12 @@ const EditarMeta = () => {
         }
 
         try {
-            await editarDadosMeta(id, {
+            await editarDadosMeta(Number(id), {
                 nome: nomeMeta,
-                valor_meta: valorMeta,
+                valor_meta: Number(valorMeta),
                 data_limite: dataLimiteMeta,
                 status: statusMeta,
-                id_financeiro: idFinanceiro
+                id_financeiro: Number(idFinanceiro)
             });
 
             setError("");
@@ -92,20 +92,20 @@ const EditarMeta = () => {
     };
 
     return (
-        <div className="dashboard_container">
+        <DashBoardContainer>
             <Cabecalho /> 
             <MenuLateral />
-            <main className="dashboard_main_cadastro_metas">
+            <DashboardMainCadastroMetas>
                 <p>Controle Financeiro {'>'} Metas <span> {'>'} Editar Meta</span></p>
 
-                <div className='cadastro_metas_container'>
+                <CadastroMetasContainer>
 
-                    <form className='cadastro_metas_form'>
-                        <div className='inputs_form'>
+                    <CadastroMetasForm>
+                        <InputsContainer>
 
-                            <div className='input_nome_meta'>
-                                <label htmlFor="nomeMeta">Nome da Meta</label>
-                                <input
+                            <InputNomeMeta>
+                                <InputLabel htmlFor="nomeMeta">Nome da Meta</InputLabel>
+                                <InputField
                                     id="nomeMeta"
                                     type="text"
                                     name="nomeMeta"
@@ -114,22 +114,22 @@ const EditarMeta = () => {
                                     value={nomeMeta}
                                     onChange={(e) => setNomeMeta(e.target.value)}
                                 />
-                            </div>
+                            </InputNomeMeta>
 
-                            <div className='input_data_limite'>
-                                <label htmlFor="dataLimite">Data Limite:</label>
-                                <input
+                            <InputDataLimite>
+                                <InputLabel htmlFor="dataLimite">Data Limite:</InputLabel>
+                                <InputField
                                     id="dataLimite"
                                     type="date"
                                     name="dataLimite"
                                     value={dataLimiteMeta}
                                     onChange={(e) => setDataLimiteMeta(e.target.value)}
                                 />
-                            </div>
+                            </InputDataLimite>
 
-                            <div className='input_valor_meta'>
-                                <label htmlFor="valorMeta">Valor da Meta</label>
-                                <input
+                            <InputValorMeta>
+                                <InputLabel htmlFor="valorMeta">Valor da Meta</InputLabel>
+                                <InputField
                                     id="valorMeta"
                                     type="number"
                                     step="any"
@@ -139,23 +139,23 @@ const EditarMeta = () => {
                                     value={valorMeta}
                                     onChange={(e) => setValorMeta(e.target.value)}
                                 />
-                            </div>
+                            </InputValorMeta>
 
-                        </div>
+                        </InputsContainer>
 
-                        <div className="container_mensagem_cadastro_metas">
-                            {success && <p className="mensagem_cadastro_sucesso">{success}</p>}
-                            {error && <p className="mensagem_cadastro_erro">{error}</p>}
-                        </div>
+                        <MensagensContainer>
+                            {success && <MensagemSucesso>{success}</MensagemSucesso>}
+                            {error && <MensagemErro>{error}</MensagemErro>}
+                        </MensagensContainer>
 
-                        <div className='botoes_form'>
-                            <button type='button' onClick={() => navigate("/metas")}>Cancelar</button>
-                            <button type='button' onClick={handleEditarMeta}>Editar Meta</button>
-                        </div>
-                    </form>
-                </div>
-            </main>
-        </div>
+                        <BotoesContainer>
+                            <BotaoAcao onClick={() => navigate("/metas")}>Cancelar</BotaoAcao>
+                            <BotaoAcao type='button' onClick={handleEditarMeta}>Editar Meta</BotaoAcao>
+                        </BotoesContainer>
+                    </CadastroMetasForm>
+                </CadastroMetasContainer>
+            </DashboardMainCadastroMetas>
+        </DashBoardContainer>
     )
 }
 
