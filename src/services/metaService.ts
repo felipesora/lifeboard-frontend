@@ -1,6 +1,7 @@
+import type { MetaResponse } from "../types/meta";
 import { obterDadosUsuario } from "./usuarioService";
 
-export async function obterDadosMeta(id) {
+export async function obterDadosMeta(id: number): Promise<MetaResponse> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/metas/${id}`, {
@@ -47,7 +48,7 @@ export async function cadastrarMeta(meta) {
     return await response.json();
 }
 
-export async function adicionarSaldo(id, valor) {
+export async function adicionarSaldo(id: number, valor: number): Promise<void> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/metas/${id}/adicionar-saldo`, {
@@ -62,7 +63,7 @@ export async function adicionarSaldo(id, valor) {
     });
 
     if (!response.ok) {
-        const data = await response.json().catch(() => ({})); // evita erro se não vier JSON
+        const data = await response.json().catch(() => ({}));
         throw {
             status: response.status,
             data
@@ -72,7 +73,7 @@ export async function adicionarSaldo(id, valor) {
     return;
 }
 
-export async function retirarSaldo(id, valor) {
+export async function retirarSaldo(id: number, valor: number): Promise<void> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/metas/${id}/retirar-saldo`, {
@@ -121,7 +122,7 @@ export async function editarDadosMeta(idMeta, novaMeta) {
     return await response.json();
 }
 
-export async function deletarMeta(idMeta) {
+export async function deletarMeta(idMeta: number): Promise<void> {
         const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/metas/${idMeta}`, {

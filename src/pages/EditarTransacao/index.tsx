@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import MenuLateral from '../../components/MenuLateral';
-import './EditarTransacao.css'
 import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 import { useParams, useNavigate } from 'react-router-dom';
 import { editarDadosTransacao, obterDadosTransacao } from '../../services/transacaoService';
