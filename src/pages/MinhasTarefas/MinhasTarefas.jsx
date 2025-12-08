@@ -7,7 +7,7 @@ import { obterTarefas } from '../../utils/obterTarefas';
 import IconeMenuVertical from "../../assets/images/icone-menu-vertical.png";
 import { deletarTarefa } from "../../services/tarefasService";
 import { exportarParaExcel } from '../../utils/exportarParaExcel';
-import ModalDeletarTarefa from '../../components/ModalDeletarTarefa/ModalDeletarTarefa';
+import ModalDeletarTarefa from '../../components/ModalDeletarTarefa';
 import Cabecalho from "../../components/Cabecalho";
 
 const MinhasTarefas = () => {

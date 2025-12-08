@@ -1,4 +1,4 @@
-import { obterDadosUsuario } from "./usuarioService";
+import type { TarefaEditDTO } from "../types/tarefa";
 
 
 export async function obterDadosTarefa(id) {
@@ -45,7 +45,7 @@ export async function cadastrarTarefa(tarefa) {
     return await response.json();
 }
 
-export async function editarDadosTarefa(idTarefa, novaTarefa) {
+export async function editarDadosTarefa(idTarefa: number, novaTarefa: TarefaEditDTO): Promise<void> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
@@ -72,7 +72,7 @@ export async function editarDadosTarefa(idTarefa, novaTarefa) {
     return await response.json();
 }
 
-export async function deletarTarefa(idTarefa) {
+export async function deletarTarefa(idTarefa: number): Promise<void> {
         const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/tarefas/${idTarefa}`, {

@@ -7,7 +7,7 @@ export async function obterTarefas() {
         throw new Error('Usuário não logado!');
     }
 
-    const usuario = await obterDadosUsuario(idUser);
+    const usuario = await obterDadosUsuario(Number(idUser));
 
     return usuario.tarefas ?? [];
 }

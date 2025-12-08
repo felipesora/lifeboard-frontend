@@ -1,4 +1,5 @@
 import type { FinanceiroResponse } from "./financeiro";
+import type { TarefaResponse } from "./tarefa";
 
 export interface UsuarioResponse {
     id_usuario: number;
@@ -6,4 +7,5 @@ export interface UsuarioResponse {
     email: string;
     senha: string;
     financeiro: FinanceiroResponse;
+    tarefas: TarefaResponse[];
 }
