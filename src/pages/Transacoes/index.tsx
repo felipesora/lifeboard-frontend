@@ -128,7 +128,6 @@ const Transacoes = () => {
         setTransacoes(todasTransacoes);
     };
 
-
     const handleEditar = (id: number) => {
         // Navegar para rota de edição, passando o ID
         navigate(`/editar-transacao/${id}`);

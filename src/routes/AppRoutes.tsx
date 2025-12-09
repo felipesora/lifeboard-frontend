@@ -12,7 +12,7 @@ import Conta from "../pages/Conta/Conta";
 import Kanban from "../pages/Kanban";
 import CadastroTarefa from "../pages/CadastroTarefa/CadastroTarefa";
 import EditarTarefa from "../pages/EditarTarefa/EditarTarefa";
-import MinhasTarefas from "../pages/MinhasTarefas/MinhasTarefas";
+import MinhasTarefas from "../pages/MinhasTarefas";
 import Pomodoro from "../pages/Pomodoro/Pomodoro";
 import NotFound from "../pages/NotFound/NotFound";
 import PaginaInicial from "../pages/PaginaInicial";
