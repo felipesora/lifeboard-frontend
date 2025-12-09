@@ -10,12 +10,14 @@ import type { TransacaoResponse } from '../../types/transacao';
 import { BotaoExcel, BotaoExcelContainer, BotaoFiltro, BotoesFiltroContainer, Breadcrumb, CelulaAcoes, DashBoardContainer, DashboardMainTransacoes, FiltroItem, FiltrosContainer, MenuTransacaoBtn, MenuTransacaoDropdown, TabelaScrollWrapper, TabelaTransacoes, TipoTransacaoSpan, TransacoesContainer, TransacoesForm } from './styles';
 import { deletarTransacao } from '../../services/transacaoService';
 import { exportarParaExcel } from '../../utils/exportarParaExcel';
+import LoadingTelaCheia from '../../components/LoadingTelaCheia';
 
 const Transacoes = () => {
     useAuthRedirect();
     const navigate = useNavigate();
     const menuRef = useRef<HTMLDivElement>(null);
 
+    const [carregando, setCarregando] = useState<boolean>(true);
     const [todasTransacoes, setTodasTransacoes] = useState<TransacaoResponse[]>([]);
     const [transacoes, setTransacoes] = useState<TransacaoResponse[]>([]);
     const [tipoTransacaoFiltro, setTipoTransacaoFiltro] = useState<string>('');
@@ -29,7 +31,7 @@ const Transacoes = () => {
     useEffect(() => {
         const fetchDadosUsuario = async () => {
             try {
-
+                setCarregando(true);
                 const transacoes = await obterTransacoes();
                 const transacoesOrdenadas = transacoes.sort((a, b) => {
                     const dataA = new Date(a.data).getTime();
@@ -43,6 +45,8 @@ const Transacoes = () => {
             } catch (erro) {
 
                 console.error("Erro ao obter dados do usuário:", erro);
+            } finally {
+                setCarregando(false);
             }
         };
 
@@ -161,188 +165,192 @@ const Transacoes = () => {
     };
 
     return (
-        <DashBoardContainer>
-            <Cabecalho />
-            <MenuLateral />
-            <DashboardMainTransacoes>
-                <Breadcrumb>
-                    Controle Financeiro <span> {'>'} Transações</span>
-                </Breadcrumb>
+        <>
+             <LoadingTelaCheia  carregando={carregando}/>
 
-                <TransacoesContainer>
+            <DashBoardContainer $carregando={carregando}>
+                <Cabecalho />
+                <MenuLateral />
+                <DashboardMainTransacoes>
+                    <Breadcrumb>
+                        Controle Financeiro <span> {'>'} Transações</span>
+                    </Breadcrumb>
 
-                    <TransacoesForm>
+                    <TransacoesContainer>
 
-                        <FiltrosContainer>
+                        <TransacoesForm>
 
-                            <FiltroItem>
-                                <label htmlFor="tipoTransacao">Tipo de Transação:</label>
-                                <select
-                                id="tipoTransacao"
-                                name="tipoTransacao"
-                                value={tipoTransacaoFiltro}
-                                onChange={(e) => setTipoTransacaoFiltro(e.target.value)}
-                                >
-                                <option value="" disabled>Selecione um tipo</option>
-                                <option value="ENTRADA">Entrada</option>
-                                <option value="SAIDA">Saída</option>
-                                <option value="APLICACAO">Aplicação</option>
-                                <option value="RESGATE">Resgate</option>
-                                </select>
-                            </FiltroItem>
+                            <FiltrosContainer>
 
-                            <FiltroItem>
-                                <label htmlFor="dataInicio">Data Início:</label>
-                                <input
-                                id="dataInicio"
-                                type="date"
-                                name="dataInicio"
-                                value={dataInicioFiltro}
-                                onChange={(e) => setDataInicioFiltro(e.target.value)}
-                                />
-                            </FiltroItem>
+                                <FiltroItem>
+                                    <label htmlFor="tipoTransacao">Tipo de Transação:</label>
+                                    <select
+                                    id="tipoTransacao"
+                                    name="tipoTransacao"
+                                    value={tipoTransacaoFiltro}
+                                    onChange={(e) => setTipoTransacaoFiltro(e.target.value)}
+                                    >
+                                    <option value="" disabled>Selecione um tipo</option>
+                                    <option value="ENTRADA">Entrada</option>
+                                    <option value="SAIDA">Saída</option>
+                                    <option value="APLICACAO">Aplicação</option>
+                                    <option value="RESGATE">Resgate</option>
+                                    </select>
+                                </FiltroItem>
 
-                            <FiltroItem>
-                                <label htmlFor="dataFim">Data Fim:</label>
-                                <input
-                                id="dataFim"
-                                type="date"
-                                name="dataFim"
-                                value={dataFimFiltro}
-                                onChange={(e) => setDataFimFiltro(e.target.value)}
-                                />
-                            </FiltroItem>
+                                <FiltroItem>
+                                    <label htmlFor="dataInicio">Data Início:</label>
+                                    <input
+                                    id="dataInicio"
+                                    type="date"
+                                    name="dataInicio"
+                                    value={dataInicioFiltro}
+                                    onChange={(e) => setDataInicioFiltro(e.target.value)}
+                                    />
+                                </FiltroItem>
 
-                            <FiltroItem>
-                                <label htmlFor="categoria">Categoria:</label>
-                                <select
-                                id="categoria"
-                                name="categoria"
-                                value={categoriaFiltro}
-                                onChange={(e) => setCategoriaFiltro(e.target.value)}
-                                >
-                                <option value="" disabled>Selecione uma categoria</option>
-                                <option value="ALIMENTACAO">Alimentação</option>
-                                <option value="TRANSPORTE">Transporte</option>
-                                <option value="MORADIA">Moradia</option>
-                                <option value="LAZER">Lazer</option>
-                                <option value="SALARIO">Salário</option>
-                                <option value="SAUDE">Saúde</option>
-                                <option value="INVESTIMENTO">Investimento</option>
-                                <option value="OUTROS">Outros</option>
-                                </select>
-                            </FiltroItem>
+                                <FiltroItem>
+                                    <label htmlFor="dataFim">Data Fim:</label>
+                                    <input
+                                    id="dataFim"
+                                    type="date"
+                                    name="dataFim"
+                                    value={dataFimFiltro}
+                                    onChange={(e) => setDataFimFiltro(e.target.value)}
+                                    />
+                                </FiltroItem>
 
-                        </FiltrosContainer>
+                                <FiltroItem>
+                                    <label htmlFor="categoria">Categoria:</label>
+                                    <select
+                                    id="categoria"
+                                    name="categoria"
+                                    value={categoriaFiltro}
+                                    onChange={(e) => setCategoriaFiltro(e.target.value)}
+                                    >
+                                    <option value="" disabled>Selecione uma categoria</option>
+                                    <option value="ALIMENTACAO">Alimentação</option>
+                                    <option value="TRANSPORTE">Transporte</option>
+                                    <option value="MORADIA">Moradia</option>
+                                    <option value="LAZER">Lazer</option>
+                                    <option value="SALARIO">Salário</option>
+                                    <option value="SAUDE">Saúde</option>
+                                    <option value="INVESTIMENTO">Investimento</option>
+                                    <option value="OUTROS">Outros</option>
+                                    </select>
+                                </FiltroItem>
 
-                        <BotoesFiltroContainer>
-                            <BotaoFiltro type="button" onClick={() => setTransacoes(aplicarFiltros())}>
-                                Filtrar
-                            </BotaoFiltro>
-                            <BotaoFiltro type="button" onClick={limparFiltros}>
-                                Limpar Filtros
-                            </BotaoFiltro>
-                            <BotaoFiltro type="button" onClick={() => navigate("/cadastrar-transacao")}>
-                                Cadastrar Transação
-                            </BotaoFiltro>
-                        </BotoesFiltroContainer>
-                    </TransacoesForm>
+                            </FiltrosContainer>
 
-                    <TabelaScrollWrapper>
-                        <TabelaTransacoes>
-                        <thead>
-                            <tr>
-                            <th>Descrição</th>
-                            <th>Categoria</th>
-                            <th>Data</th>
-                            <th>Tipo</th>
-                            <th>Valor</th>
-                            <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {transacoes.length > 0 ? (
-                            transacoes.map((transacao, index) => {
-                                const isLastRows = index >= transacoes.length - 2;
-                                return (
-                                <tr key={transacao.id_transacao}>
-                                    <td>{transacao.descricao}</td>
-                                    <td>{formatarCategoria(transacao.categoria)}</td>
-                                    <td>{new Date(transacao.data).toLocaleDateString('pt-BR')}</td>
-                                    <td>
-                                    <TipoTransacaoSpan tipo={transacao.tipo}>
-                                        {formatarTipoFormatado(transacao.tipo)}
-                                    </TipoTransacaoSpan>
-                                    </td>
-                                    <td>
-                                    {transacao.valor.toLocaleString('pt-BR', {
-                                        style: 'currency',
-                                        currency: 'BRL',
-                                    })}
-                                    </td>
-                                    <CelulaAcoes>
-                                    <div ref={transacaoSelecionada === transacao.id_transacao ? menuRef : null} style={{ display: 'inline-block' }}>
-                                        <MenuTransacaoBtn onClick={() => setTransacaoSelecionada(transacao.id_transacao)}>
-                                        <img src={IconeMenuVertical} alt="Ícone de menu" />
-                                        </MenuTransacaoBtn>
-                                        {transacaoSelecionada === transacao.id_transacao && (
-                                        <MenuTransacaoDropdown isOpenUp={isLastRows}>
-                                            <button onClick={() => handleEditar(transacao.id_transacao)}>Editar</button>
-                                            <button onClick={() => handleDeletar(transacao.id_transacao)}>Deletar</button>
-                                        </MenuTransacaoDropdown>
-                                        )}
-                                    </div>
-                                    </CelulaAcoes>
+                            <BotoesFiltroContainer>
+                                <BotaoFiltro type="button" onClick={() => setTransacoes(aplicarFiltros())}>
+                                    Filtrar
+                                </BotaoFiltro>
+                                <BotaoFiltro type="button" onClick={limparFiltros}>
+                                    Limpar Filtros
+                                </BotaoFiltro>
+                                <BotaoFiltro type="button" onClick={() => navigate("/cadastrar-transacao")}>
+                                    Cadastrar Transação
+                                </BotaoFiltro>
+                            </BotoesFiltroContainer>
+                        </TransacoesForm>
+
+                        <TabelaScrollWrapper>
+                            <TabelaTransacoes>
+                            <thead>
+                                <tr>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th></th>
                                 </tr>
-                                );
-                            })
-                            ) : (
-                            <tr>
-                                <td colSpan={6}>Nenhuma transação encontrada.</td>
-                            </tr>
-                            )}
-                        </tbody>
-                        </TabelaTransacoes>
-                    </TabelaScrollWrapper>
+                            </thead>
+                            <tbody>
+                                {transacoes.length > 0 ? (
+                                transacoes.map((transacao, index) => {
+                                    const isLastRows = index >= transacoes.length - 2;
+                                    return (
+                                    <tr key={transacao.id_transacao}>
+                                        <td>{transacao.descricao}</td>
+                                        <td>{formatarCategoria(transacao.categoria)}</td>
+                                        <td>{new Date(transacao.data).toLocaleDateString('pt-BR')}</td>
+                                        <td>
+                                        <TipoTransacaoSpan tipo={transacao.tipo}>
+                                            {formatarTipoFormatado(transacao.tipo)}
+                                        </TipoTransacaoSpan>
+                                        </td>
+                                        <td>
+                                        {transacao.valor.toLocaleString('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        })}
+                                        </td>
+                                        <CelulaAcoes>
+                                        <div ref={transacaoSelecionada === transacao.id_transacao ? menuRef : null} style={{ display: 'inline-block' }}>
+                                            <MenuTransacaoBtn onClick={() => setTransacaoSelecionada(transacao.id_transacao)}>
+                                            <img src={IconeMenuVertical} alt="Ícone de menu" />
+                                            </MenuTransacaoBtn>
+                                            {transacaoSelecionada === transacao.id_transacao && (
+                                            <MenuTransacaoDropdown isOpenUp={isLastRows}>
+                                                <button onClick={() => handleEditar(transacao.id_transacao)}>Editar</button>
+                                                <button onClick={() => handleDeletar(transacao.id_transacao)}>Deletar</button>
+                                            </MenuTransacaoDropdown>
+                                            )}
+                                        </div>
+                                        </CelulaAcoes>
+                                    </tr>
+                                    );
+                                })
+                                ) : (
+                                <tr>
+                                    <td colSpan={6}>Nenhuma transação encontrada.</td>
+                                </tr>
+                                )}
+                            </tbody>
+                            </TabelaTransacoes>
+                        </TabelaScrollWrapper>
 
-                    <BotaoExcelContainer>
-                        <BotaoExcel type="button" onClick={exportarTransacoes}>
-                        Exportar para Excel
-                        </BotaoExcel>
-                    </BotaoExcelContainer>
+                        <BotaoExcelContainer>
+                            <BotaoExcel type="button" onClick={exportarTransacoes}>
+                            Exportar para Excel
+                            </BotaoExcel>
+                        </BotaoExcelContainer>
 
-                </TransacoesContainer>
+                    </TransacoesContainer>
 
-                <ModalDeletarTransacao
-                    aberto={modalDelete}
-                    onClose={() => setModalDelete(false)}
-                    onDelete={async () => {
-                        if (idTransacaoParaDeletar === null) return;
+                    <ModalDeletarTransacao
+                        aberto={modalDelete}
+                        onClose={() => setModalDelete(false)}
+                        onDelete={async () => {
+                            if (idTransacaoParaDeletar === null) return;
 
-                        try {
-                            await deletarTransacao(idTransacaoParaDeletar);
+                            try {
+                                await deletarTransacao(idTransacaoParaDeletar);
 
-                            // RECARREGAR do backend
-                            const transacoesAtualizadas = await obterTransacoes();
-                            const transacoesOrdenadas = transacoesAtualizadas.sort((a, b) => {
-                                const dataA = new Date(a.data).getTime();
-                                const dataB = new Date(b.data).getTime();
-                                return dataB - dataA;
-                            });
+                                // RECARREGAR do backend
+                                const transacoesAtualizadas = await obterTransacoes();
+                                const transacoesOrdenadas = transacoesAtualizadas.sort((a, b) => {
+                                    const dataA = new Date(a.data).getTime();
+                                    const dataB = new Date(b.data).getTime();
+                                    return dataB - dataA;
+                                });
 
-                            setTodasTransacoes(transacoesOrdenadas);
-                            setTransacoes(transacoesOrdenadas);
+                                setTodasTransacoes(transacoesOrdenadas);
+                                setTransacoes(transacoesOrdenadas);
 
-                            setModalDelete(false);
-                            setIdTransacaoParaDeletar(null);
-                        } catch (erro) {
-                            console.error("Erro ao deletar:", erro);
-                            alert("Erro ao deletar a transação. Por favor, tente novamente.");
-                        }
-                    }}
-                />
-            </DashboardMainTransacoes>
-        </DashBoardContainer>
+                                setModalDelete(false);
+                                setIdTransacaoParaDeletar(null);
+                            } catch (erro) {
+                                console.error("Erro ao deletar:", erro);
+                                alert("Erro ao deletar a transação. Por favor, tente novamente.");
+                            }
+                        }}
+                    />
+                </DashboardMainTransacoes>
+            </DashBoardContainer>
+        </>
     )
 }
 

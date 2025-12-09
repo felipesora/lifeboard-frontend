@@ -1,9 +1,20 @@
 import styled from "styled-components";
 
-export const DashboardContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
-  align-items: stretch;
+interface DashBoardContainerProps {
+  $carregando?: boolean;
+}
+
+export const DashBoardContainer = styled.div<DashBoardContainerProps>`
+    display: flex;
+    min-height: 100vh;
+    align-items: stretch;
+    @media (max-width: 1260px) {
+        display: initial;
+    }
+    ${props => props.$carregando && `
+        pointer-events: none;
+        user-select: none;
+    `}
 `;
 
 export const DashboardMainKanban = styled.main`

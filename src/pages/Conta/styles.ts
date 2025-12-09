@@ -1,12 +1,20 @@
 import styled from "styled-components";
 
-export const DashBoardContainer = styled.div`
+interface DashBoardContainerProps {
+  $carregando?: boolean;
+}
+
+export const DashBoardContainer = styled.div<DashBoardContainerProps>`
     display: flex;
     min-height: 100vh;
     align-items: stretch;
     @media (max-width: 1260px) {
         display: initial;
     }
+    ${props => props.$carregando && `
+        pointer-events: none;
+        user-select: none;
+    `}
 `;
 
 export const DashboardMainConta = styled.main`
