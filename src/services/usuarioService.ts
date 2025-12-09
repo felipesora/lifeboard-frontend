@@ -1,4 +1,4 @@
-import type { UsuarioResponse } from "../types/usuario";
+import type { UsuarioEditRequest, UsuarioResponse } from "../types/usuario";
 
 export async function obterDadosUsuario(id: number): Promise<UsuarioResponse> {
     const token = localStorage.getItem('token');
@@ -23,7 +23,7 @@ export async function obterDadosUsuario(id: number): Promise<UsuarioResponse> {
     return await response.json();
 }
 
-export async function editarDadosUsuario(idUsuario, novoUsuario) {
+export async function editarDadosUsuario(idUsuario: number, novoUsuario: UsuarioEditRequest): Promise<void> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/usuarios/${idUsuario}`, {
@@ -46,7 +46,7 @@ export async function editarDadosUsuario(idUsuario, novoUsuario) {
     return await response.json();
 }
 
-export async function deletarUsuario(id) {
+export async function deletarUsuario(id: number): Promise<void> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
@@ -64,7 +64,7 @@ export async function deletarUsuario(id) {
     return;
 }
 
-export async function obterFotoPerfil() {
+export async function obterFotoPerfil(): Promise<Blob> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
@@ -84,7 +84,7 @@ export async function obterFotoPerfil() {
     return blob;
 }
 
-export async function atualizarFotoPefil(formData) {
+export async function atualizarFotoPefil(formData: FormData): Promise<Blob> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
@@ -104,7 +104,7 @@ export async function atualizarFotoPefil(formData) {
     return blob;
 }
 
-export async function removerFotoPerfil() {
+export async function removerFotoPerfil(): Promise<void> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 

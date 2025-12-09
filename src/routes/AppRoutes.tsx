@@ -8,13 +8,13 @@ import EditarTransacao from "../pages/EditarTransacao";
 import Metas from "../pages/Metas";
 import CadastroMeta from "../pages/CadastroMeta";
 import EditarMeta from "../pages/EditarMeta";
-import Conta from "../pages/Conta/Conta";
+import Conta from "../pages/Conta";
 import Kanban from "../pages/Kanban";
 import CadastroTarefa from "../pages/CadastroTarefa";
 import EditarTarefa from "../pages/EditarTarefa";
 import MinhasTarefas from "../pages/MinhasTarefas";
 import Pomodoro from "../pages/Pomodoro";
-import NotFound from "../pages/NotFound/NotFound";
+import NotFound from "../pages/NotFound";
 import PaginaInicial from "../pages/PaginaInicial";
 
 export const routes = createBrowserRouter([

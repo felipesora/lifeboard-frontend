@@ -9,3 +9,9 @@ export interface UsuarioResponse {
     financeiro: FinanceiroResponse;
     tarefas: TarefaResponse[];
 }
+
+export interface UsuarioEditRequest {
+  nome: string;
+  email: string;
+  senha: string;
+}
