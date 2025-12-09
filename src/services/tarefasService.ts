@@ -1,7 +1,7 @@
-import type { TarefaEditDTO } from "../types/tarefa";
+import type { TarefaCreateDTO, TarefaEditDTO, TarefaResponse } from "../types/tarefa";
 
 
-export async function obterDadosTarefa(id) {
+export async function obterDadosTarefa(id: number): Promise<TarefaResponse> {
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://localhost:8080/api/tarefas/${id}`, {
@@ -17,7 +17,7 @@ export async function obterDadosTarefa(id) {
     return await response.json();
 }
 
-export async function cadastrarTarefa(tarefa) {
+export async function cadastrarTarefa(tarefa: TarefaCreateDTO): Promise<void> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 

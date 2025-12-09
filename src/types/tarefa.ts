@@ -14,7 +14,6 @@ export interface TarefaCreateDTO {
     data_limite: string;
     prioridade: "BAIXA" | "MEDIA" | "ALTA";
     status: "A_FAZER" | "EM_ANDAMENTO" | "CONCLUIDA";
-    id_usuario: number;
 }
 
 export interface TarefaEditDTO {
