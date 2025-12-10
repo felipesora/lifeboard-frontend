@@ -33,10 +33,37 @@ const ControleFinanceiro = () => {
     const [saldo, setSaldo] = useState<number>(0);
     const [salario, setSalario] = useState<number>(0);
     const [gastosMes, setGastosMes] = useState<number>(0);
-    const [gastosAno, setGastosAno] = useState(Array(12).fill(0));
+    const [gastosUltimos12Meses, setGastosUltimos12Meses] = useState<Array<{name: string, valor: number}>>([]);
     const [modalSalarioAberto, setModalSalarioAberto] = useState<boolean>(false);
     const [transacoes, setTransacoes] = useState<TransacaoResponse[]>([]);
     const [metas, setMetas] = useState<MetaResponse[]>([]);
+
+    const obterUltimos12Meses = (): Array<{name: string, mes: number, ano: number}> => {
+        const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        const resultado = [];
+        const dataAtual = new Date();
+        
+        for (let i = 0; i < 12; i++) {
+            const data = new Date(dataAtual);
+            data.setMonth(data.getMonth() - i);
+            
+            const mes = data.getMonth();
+            const ano = data.getFullYear();
+            
+            let nomeMes = meses[mes];
+            if (ano !== dataAtual.getFullYear()) {
+                nomeMes = `${meses[mes]}/${ano.toString().slice(2)}`;
+            }
+            
+            resultado.unshift({
+                name: nomeMes,
+                mes: mes,
+                ano: ano
+            });
+        }
+        
+        return resultado;
+    };
 
     useEffect(() => {
         const fetchDadosUsuario = async (): Promise<void> => {
@@ -71,18 +98,26 @@ const ControleFinanceiro = () => {
                 })
                 .reduce((total, t) => total + t.valor, 0);
 
+                setGastosMes(totalSaidasMes);
 
-                // Gastos por mês no ano
-                const gastosPorMes: number[] = Array(12).fill(0);
-                saidas.forEach((t) => {
-                    const dt = new Date(t.data);
-                    if (dt.getFullYear() === currentYear) {
-                        gastosPorMes[dt.getMonth()] += t.valor;
-                    }
+
+                // Obter estrutura dos últimos 12 meses
+                const mesesParaCalcular = obterUltimos12Meses();
+
+                // Calcular gastos para cada mês
+                const gastosPorMes = mesesParaCalcular.map(({ name, mes, ano }) => {
+                    const total = saidas.reduce((acc, t) => {
+                        const dt = new Date(t.data);
+                        if (dt.getMonth() === mes && dt.getFullYear() === ano) {
+                            return acc + t.valor;
+                        }
+                        return acc;
+                    }, 0);
+                    
+                    return { name, valor: total };
                 });
 
-                setGastosMes(totalSaidasMes);
-                setGastosAno(gastosPorMes);
+                setGastosUltimos12Meses(gastosPorMes);
 
 
                 // Transações
@@ -120,20 +155,7 @@ const ControleFinanceiro = () => {
         fetchDadosUsuario();
     }, []);
 
-    const data = [
-        { name: 'Jan', valor: gastosAno[0] },
-        { name: 'Fev', valor: gastosAno[1] },
-        { name: 'Mar', valor: gastosAno[2] },
-        { name: 'Abr', valor: gastosAno[3] },
-        { name: 'Mai', valor: gastosAno[4] },
-        { name: 'Jun', valor: gastosAno[5] },
-        { name: 'Jul', valor: gastosAno[6] },
-        { name: 'Ago', valor: gastosAno[7] },
-        { name: 'Set', valor: gastosAno[8] },
-        { name: 'Out', valor: gastosAno[9] },
-        { name: 'Nov', valor: gastosAno[10] },
-        { name: 'Dez', valor: gastosAno[11] },
-    ];
+    const data = gastosUltimos12Meses;
 
     const handleSalvarSalario = async (novoSalario: number) => {
         setCarregando(true);
@@ -211,7 +233,7 @@ const ControleFinanceiro = () => {
                                 <ContainerCardGrafico>
                                     <div className="titulo_grafico">
                                         <img src={IconeGrafico} alt="Icone de grafico" />
-                                        <p>Gastos por Mês</p>
+                                        <p>Gastos dos Últimos 12 Meses</p>
                                     </div>
                                     <GastosMensaisGrafico dados={data} />
                                 </ContainerCardGrafico>
