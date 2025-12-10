@@ -2,10 +2,12 @@ import Logo from "../../assets/images/logo-lifeboard-azul.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import { cadastro } from "./services/cadastroService";
-import { ContainerCadastro, LinkPaginaLogin, MensagemCadastro, SecaoCadastro } from "./styles";
+import { CadastroButton, ContainerCadastro, LinkPaginaLogin, MensagemCadastro, SecaoCadastro } from "./styles";
 
 const Cadastro = () => {
     const navigate = useNavigate();
+
+    const [loading, setLoading] = useState<boolean>(false);
     const [nome, setNome] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [senha, setSenha] = useState<string>("");
@@ -15,6 +17,7 @@ const Cadastro = () => {
 
     const handleCadastro = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError('');
 
         if (senha.length < 6) {
             setError("A senha deve ter no mínimo 6 caracteres.");
@@ -29,6 +32,7 @@ const Cadastro = () => {
         }
 
         try {
+            setLoading(true);
             await cadastro({ nome, email, senha });
             setError("");
             setSuccess("Cadastro realizado com sucesso!");
@@ -52,6 +56,8 @@ const Cadastro = () => {
             }
 
             setSuccess("");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -74,6 +80,7 @@ const Cadastro = () => {
                             required
                             onChange={(e) => setNome(e.target.value)}
                             value={nome}
+                            disabled={loading}
                         />
                     </div>
 
@@ -85,6 +92,7 @@ const Cadastro = () => {
                             required
                             onChange={(e) => setEmail(e.target.value)}
                             value={email}
+                            disabled={loading}
                         />
                     </div>
 
@@ -96,6 +104,7 @@ const Cadastro = () => {
                             required
                             onChange={(e) => setSenha(e.target.value)}
                             value={senha}
+                            disabled={loading}
                         />
                     </div>
 
@@ -107,11 +116,14 @@ const Cadastro = () => {
                             required
                             onChange={(e) => setConfirmarSenha(e.target.value)}
                             value={confirmarSenha}
+                            disabled={loading}
                         />
                     </div>
 
                     <div>
-                        <button type="submit">Cadastrar</button>
+                        <CadastroButton type="submit" $loading={loading} disabled={loading || !email || !senha}>
+                            {loading ? "Cadastrando..." : "Cadastrar"}
+                        </CadastroButton>
                     </div>
 
                 </form>

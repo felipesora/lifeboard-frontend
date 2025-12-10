@@ -87,21 +87,6 @@ export const SecaoLogin = styled.section`
                     box-shadow: 0 0 0 2px #d1d5db;
                 }
             }
-            button {
-                background-color: var(--cor-principal);
-                padding: 10px 0;
-                font-size: 18px;
-                color: white;
-                border: none;
-                font-family: var(--fonte-principal);
-                cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                transition: background-color 0.3s ease, box-shadow 0.3s ease;
-                &:hover {
-                    background-color: #455A64;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-                }
-            }
         }
     }
     @media (max-width: 860px) {
@@ -154,6 +139,28 @@ export const LinkPaginaCadastro = styled.div`
             color: #546E7A;
             cursor: pointer;
             text-decoration: underline;
+            margin-left: 5px;
         }
     }
+`;
+
+export const LoginButton = styled.button<{ $loading?: boolean }>`
+    background-color: var(--cor-principal);
+    padding: 10px 0;
+    font-size: 18px;
+    color: white;
+    border: none;
+    font-family: var(--fonte-principal);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+        background-color: #455A64;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+  
+    ${props => props.$loading && `
+        opacity: 0.8;
+        cursor: wait;
+    `}
 `;
