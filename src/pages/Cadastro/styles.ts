@@ -9,12 +9,18 @@ export const ContainerCadastro = styled.div`
     min-height: 100vh;
     /* ocupa pelo menos a altura total */
     gap: 30px;
+`;
+
+export const BotaoLogo = styled.div`
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
     img {
         @media (max-width: 670px) {
             width: 90px;
             height: auto;
         }
-        @media (max-width: 630px) {
+        @media (max-width: 610px) {
             width: 80px;
         }
     }

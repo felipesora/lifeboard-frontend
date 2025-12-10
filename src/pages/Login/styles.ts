@@ -9,6 +9,12 @@ export const ContainerLogin = styled.div`
     min-height: 100vh;
     /* ocupa pelo menos a altura total */
     gap: 30px;
+`;
+
+export const BotaoLogo = styled.div`
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
     img {
         @media (max-width: 670px) {
             width: 90px;

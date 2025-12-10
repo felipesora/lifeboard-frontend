@@ -2,7 +2,7 @@ import Logo from "../../assets/images/logo-lifeboard-azul.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import { cadastro } from "./services/cadastroService";
-import { CadastroButton, ContainerCadastro, LinkPaginaLogin, MensagemCadastro, SecaoCadastro } from "./styles";
+import { BotaoLogo, CadastroButton, ContainerCadastro, LinkPaginaLogin, MensagemCadastro, SecaoCadastro } from "./styles";
 
 const Cadastro = () => {
     const navigate = useNavigate();
@@ -63,7 +63,10 @@ const Cadastro = () => {
 
     return (
         <ContainerCadastro>
-            <img src={Logo} alt="Logo do LifeBoard" />
+            <BotaoLogo onClick={() => navigate('/')}>
+                <img src={Logo} alt="Logo do LifeBoard" />
+            </BotaoLogo>
+
             <SecaoCadastro>
                 <div className="cadastro_conteudo">
                     <h1>Bem-vindo ao LifeBoard</h1>

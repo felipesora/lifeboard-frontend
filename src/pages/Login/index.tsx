@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { login } from './services/loginService';
 import { isTokenValid } from '../../services/authService';
-import { ContainerLogin, LinkPaginaCadastro, LoginButton, MensagemLogin, SecaoLogin } from './styles';
+import { BotaoLogo, ContainerLogin, LinkPaginaCadastro, LoginButton, MensagemLogin, SecaoLogin } from './styles';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -37,7 +37,9 @@ const Login = () => {
 
     return (
         <ContainerLogin>
-            <img src={Logo} alt="Logo do LifeBoard" />
+            <BotaoLogo onClick={() => navigate('/')}>
+                <img src={Logo} alt="Logo do LifeBoard" />
+            </BotaoLogo>
 
             <SecaoLogin>
                 <div className="login_conteudo">
