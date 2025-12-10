@@ -1,6 +1,7 @@
 import IconeFechar from '../../assets/images/icone-fechar.png';
 import { useNavigate } from 'react-router-dom';
-import { ContainerModalLogout, ConteudoModalLogout } from "./styles";
+import { ContainerModalLogout, ConteudoModalLogout, SairButton } from "./styles";
+import { useState } from 'react';
 
 interface ModalLogout {
     aberto: boolean;
@@ -9,13 +10,22 @@ interface ModalLogout {
 
 const ModalLogout = ({ aberto, onClose }: ModalLogout) => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState<boolean>(false);
 
     if (!aberto) return null;
 
     const handleLogout = async () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        navigate('/login');
+        try {
+            setLoading(true);
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            navigate('/login');
+        } catch (error) {
+            console.log("Erro ao sair da conta");
+        } finally {
+            setLoading(false);
+        }
+        
     }
 
     return (
@@ -37,7 +47,9 @@ const ModalLogout = ({ aberto, onClose }: ModalLogout) => {
 
                     <div className="botoes">
                         <button type="button" onClick={onClose}>Cancelar</button>
-                        <button type="button" onClick={handleLogout}>Sair</button>
+                        <SairButton type="button" onClick={handleLogout} $loading={loading} disabled={loading}>
+                            {loading ? 'Saindo...' : 'Sair'}
+                        </SairButton>
                     </div>
                 </div>
 

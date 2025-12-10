@@ -4,13 +4,16 @@ import MenuLateral from "../../components/MenuLateral";
 import { useEffect, useState } from "react";
 import { editarDadosMeta, obterDadosMeta } from "../../services/metaService";
 import Cabecalho from "../../components/Cabecalho";
-import { BotaoAcao, BotoesContainer, CadastroMetasContainer, CadastroMetasForm, DashBoardContainer, DashboardMainCadastroMetas, InputDataLimite, InputField, InputLabel, InputNomeMeta, InputsContainer, InputValorMeta, MensagemErro, MensagemSucesso, MensagensContainer } from "./styles";
+import { BotaoAcao, BotoesContainer, CadastroMetasContainer, CadastroMetasForm, DashBoardContainer, DashboardMainCadastroMetas, EditarButton, InputDataLimite, InputField, InputLabel, InputNomeMeta, InputsContainer, InputValorMeta, MensagemErro, MensagemSucesso, MensagensContainer } from "./styles";
+import LoadingTelaCheia from "../../components/LoadingTelaCheia";
 
 const EditarMeta = () => {
     useAuthRedirect();
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [nomeMeta, setNomeMeta] = useState<string>('');
     const [dataLimiteMeta, setDataLimiteMeta] = useState<string>('');
     const [valorMeta, setValorMeta] = useState('');
@@ -22,6 +25,7 @@ const EditarMeta = () => {
     useEffect(() => {
         const fetchMeta = async () => {
             try {
+                setLoadingFetch(true);
                 const dados = await obterDadosMeta(Number(id));
                 setNomeMeta(dados.nome);
                 setDataLimiteMeta(dados.data_limite);
@@ -31,6 +35,8 @@ const EditarMeta = () => {
             } catch (erro) {
                 console.error(erro);
                 setError("Erro ao carregar dados da meta.");
+            } finally {
+                setLoadingFetch(false);
             }
         };
 
@@ -70,6 +76,8 @@ const EditarMeta = () => {
         }
 
         try {
+            setLoading(true);
+
             await editarDadosMeta(Number(id), {
                 nome: nomeMeta,
                 valor_meta: Number(valorMeta),
@@ -88,74 +96,90 @@ const EditarMeta = () => {
             console.error(erro);
             setError("Erro ao editar a meta. Tente novamente.");
             setSuccess("");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <DashBoardContainer>
-            <Cabecalho /> 
-            <MenuLateral />
-            <DashboardMainCadastroMetas>
-                <p>Controle Financeiro {'>'} Metas <span> {'>'} Editar Meta</span></p>
+        <>
+            <LoadingTelaCheia carregando={loadingFetch}/>
 
-                <CadastroMetasContainer>
+            <DashBoardContainer $carregando={loadingFetch}>
+                <Cabecalho /> 
+                <MenuLateral />
+                <DashboardMainCadastroMetas>
+                    <p>Controle Financeiro {'>'} Metas <span> {'>'} Editar Meta</span></p>
 
-                    <CadastroMetasForm>
-                        <InputsContainer>
+                    <CadastroMetasContainer>
 
-                            <InputNomeMeta>
-                                <InputLabel htmlFor="nomeMeta">Nome da Meta</InputLabel>
-                                <InputField
-                                    id="nomeMeta"
-                                    type="text"
-                                    name="nomeMeta"
-                                    placeholder='Ex: Viagem para Europa'
-                                    required
-                                    value={nomeMeta}
-                                    onChange={(e) => setNomeMeta(e.target.value)}
-                                />
-                            </InputNomeMeta>
+                        <CadastroMetasForm>
+                            <InputsContainer>
 
-                            <InputDataLimite>
-                                <InputLabel htmlFor="dataLimite">Data Limite:</InputLabel>
-                                <InputField
-                                    id="dataLimite"
-                                    type="date"
-                                    name="dataLimite"
-                                    value={dataLimiteMeta}
-                                    onChange={(e) => setDataLimiteMeta(e.target.value)}
-                                />
-                            </InputDataLimite>
+                                <InputNomeMeta>
+                                    <InputLabel htmlFor="nomeMeta">Nome da Meta</InputLabel>
+                                    <InputField
+                                        id="nomeMeta"
+                                        type="text"
+                                        name="nomeMeta"
+                                        placeholder='Ex: Viagem para Europa'
+                                        required
+                                        value={nomeMeta}
+                                        onChange={(e) => setNomeMeta(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                </InputNomeMeta>
 
-                            <InputValorMeta>
-                                <InputLabel htmlFor="valorMeta">Valor da Meta</InputLabel>
-                                <InputField
-                                    id="valorMeta"
-                                    type="number"
-                                    step="any"
-                                    name="valorMeta"
-                                    placeholder='Ex: 10.000,00'
-                                    required
-                                    value={valorMeta}
-                                    onChange={(e) => setValorMeta(e.target.value)}
-                                />
-                            </InputValorMeta>
+                                <InputDataLimite>
+                                    <InputLabel htmlFor="dataLimite">Data Limite:</InputLabel>
+                                    <InputField
+                                        id="dataLimite"
+                                        type="date"
+                                        name="dataLimite"
+                                        value={dataLimiteMeta}
+                                        onChange={(e) => setDataLimiteMeta(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                </InputDataLimite>
 
-                        </InputsContainer>
+                                <InputValorMeta>
+                                    <InputLabel htmlFor="valorMeta">Valor da Meta</InputLabel>
+                                    <InputField
+                                        id="valorMeta"
+                                        type="number"
+                                        step="any"
+                                        name="valorMeta"
+                                        placeholder='Ex: 10.000,00'
+                                        required
+                                        value={valorMeta}
+                                        onChange={(e) => setValorMeta(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                </InputValorMeta>
 
-                        <MensagensContainer>
-                            {success && <MensagemSucesso>{success}</MensagemSucesso>}
-                            {error && <MensagemErro>{error}</MensagemErro>}
-                        </MensagensContainer>
+                            </InputsContainer>
 
-                        <BotoesContainer>
-                            <BotaoAcao onClick={() => navigate("/metas")}>Cancelar</BotaoAcao>
-                            <BotaoAcao type='button' onClick={handleEditarMeta}>Editar Meta</BotaoAcao>
-                        </BotoesContainer>
-                    </CadastroMetasForm>
-                </CadastroMetasContainer>
-            </DashboardMainCadastroMetas>
-        </DashBoardContainer>
+                            <MensagensContainer>
+                                {success && <MensagemSucesso>{success}</MensagemSucesso>}
+                                {error && <MensagemErro>{error}</MensagemErro>}
+                            </MensagensContainer>
+
+                            <BotoesContainer>
+                                <BotaoAcao onClick={() => navigate("/metas")}>Cancelar</BotaoAcao>
+                                <EditarButton
+                                    type="button" 
+                                    onClick={handleEditarMeta}
+                                    $loading={loading}
+                                    disabled={loading}
+                                    >
+                                    {loading ? 'Editando...' : 'Editar Meta'}
+                                </EditarButton>
+                            </BotoesContainer>
+                        </CadastroMetasForm>
+                    </CadastroMetasContainer>
+                </DashboardMainCadastroMetas>
+            </DashBoardContainer>
+        </>
     )
 }
 

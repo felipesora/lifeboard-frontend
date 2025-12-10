@@ -17,7 +17,8 @@ import {
   MensagemSucesso,
   MensagemErro,
   BotoesContainerTarefas,
-  BotaoAcaoTarefa
+  BotaoAcaoTarefa,
+  CadastrarButton
 } from "./styles";
 
 import { useAuthRedirect } from "../../hooks/useAuthRedirect";
@@ -36,6 +37,7 @@ const CadastroTarefa = () => {
   const fromPage = location.state?.from || "tarefas-quadro-kanban";
   const statusInicial = location.state?.status || "A_FAZER";
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [tituloTarefa, setTituloTarefa] = useState<string>('');
   const [descricao, setDescricao] = useState<string>('');
   const [dataLimite, setDataLimite] = useState<string>('');
@@ -84,6 +86,8 @@ const CadastroTarefa = () => {
     };
 
     try {
+      setLoading(true);
+
       await cadastrarTarefa(tarefa);
 
       setError("");
@@ -97,6 +101,8 @@ const CadastroTarefa = () => {
       console.log(erro);
       setError("Erro ao cadastrar a tarefa. Tente novamente.");
       setSuccess("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,6 +132,7 @@ const CadastroTarefa = () => {
                   required
                   value={tituloTarefa}
                   onChange={(e) => setTituloTarefa(e.target.value)}
+                  disabled={loading}
                 />
               </InputTituloTarefa>
 
@@ -138,6 +145,7 @@ const CadastroTarefa = () => {
                   required
                   value={descricao}
                   onChange={(e) => setDescricao(e.target.value)}
+                  disabled={loading}
                 />
               </InputDescricaoTarefa>
 
@@ -148,6 +156,7 @@ const CadastroTarefa = () => {
                   name="prioridade"
                   required
                   value={prioridade}
+                  disabled={loading}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setPrioridade(e.target.value as Prioridade)}
                 >
@@ -166,6 +175,7 @@ const CadastroTarefa = () => {
                   name="dataLimite"
                   value={dataLimite}
                   onChange={(e) => setDataLimite(e.target.value)}
+                  disabled={loading}
                 />
               </InputDataLimiteTarefa>
             </InputsContainerTarefa>
@@ -179,9 +189,14 @@ const CadastroTarefa = () => {
               <BotaoAcaoTarefa type="button" onClick={() => navigate(getRedirectUrl())}>
                 Cancelar
               </BotaoAcaoTarefa>
-              <BotaoAcaoTarefa type="button" onClick={handleCadastroTarefa}>
-                Cadastrar Tarefa
-              </BotaoAcaoTarefa>
+              <CadastrarButton 
+                type="button" 
+                onClick={handleCadastroTarefa}
+                $loading={loading}
+                disabled={loading}
+              >
+                {loading ? 'Cadastrando...' : 'Cadastrar Tarefa'}
+              </CadastrarButton>
             </BotoesContainerTarefas>
           </CadastroTarefasForm>
         </CadastroTarefasContainer>

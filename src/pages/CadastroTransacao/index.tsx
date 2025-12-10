@@ -16,7 +16,8 @@ import {
   MensagemErro,
   BotoesContainer,
   BotaoAcao,
-  DashBoardContainer
+  DashBoardContainer,
+  CadastrarButton
 } from './styles';
 
 import MenuLateral from '../../components/MenuLateral';
@@ -29,6 +30,7 @@ const CadastroTransacao = () => {
   useAuthRedirect();
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [descricaoTransacao, setDescricaoTransacao] = useState<string>('');
   const [tipoTransacao, setTipoTransacao] = useState<"ENTRADA" | "SAIDA" | "APLICACAO" | "RESGATE" | "">("");
   const [categoriaTransacao, setCategoriaTransacao] = useState<"ALIMENTACAO" | "TRANSPORTE" | "MORADIA" | "LAZER" | "SALARIO" | "SAUDE" | "OUTROS" | "">("");
@@ -37,6 +39,8 @@ const CadastroTransacao = () => {
   const [success, setSuccess] = useState<string>("");
 
   const handleCadastroTransacao = async () => {
+    setError('');
+
     if (!descricaoTransacao.trim() || !categoriaTransacao || !tipoTransacao || !valorTransacao) {
       setError("Preencha todos os campos.");
       setSuccess("");
@@ -64,6 +68,7 @@ const CadastroTransacao = () => {
     };
 
     try {
+      setLoading(true);
       await cadastrarTransacao(transacao);
 
       setError("");
@@ -77,6 +82,8 @@ const CadastroTransacao = () => {
       console.log(erro);
       setError("Erro ao cadastrar a transação. Tente novamente.");
       setSuccess("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,6 +109,7 @@ const CadastroTransacao = () => {
                   required
                   value={descricaoTransacao}
                   onChange={(e) => setDescricaoTransacao(e.target.value)}
+                  disabled={loading}
                 />
               </InputDescricao>
 
@@ -112,6 +120,7 @@ const CadastroTransacao = () => {
                   name="categoria"
                   required
                   value={categoriaTransacao}
+                  disabled={loading}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setCategoriaTransacao(e.target.value as typeof categoriaTransacao)}
                 >
@@ -133,6 +142,7 @@ const CadastroTransacao = () => {
                   name="tipoTransacao"
                   required
                   value={tipoTransacao}
+                  disabled={loading}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setTipoTransacao(e.target.value as typeof tipoTransacao)}
                 >
@@ -153,6 +163,7 @@ const CadastroTransacao = () => {
                   required
                   value={valorTransacao}
                   onChange={(e) => setValorTransacao(e.target.value)}
+                  disabled={loading}
                 />
               </InputValor>
             </InputsContainer>
@@ -166,9 +177,14 @@ const CadastroTransacao = () => {
               <BotaoAcao type="button" onClick={() => navigate("/transacoes")}>
                 Cancelar
               </BotaoAcao>
-              <BotaoAcao type="button" onClick={handleCadastroTransacao}>
-                Cadastrar Transação
-              </BotaoAcao>
+              <CadastrarButton 
+                type="button" 
+                onClick={handleCadastroTransacao}
+                $loading={loading}
+                disabled={loading}
+                >
+                {loading ? 'Cadastrando...' : 'Cadastrar Transação'}
+              </CadastrarButton>
             </BotoesContainer>
           </CadastroForm>
         </CadastroTransacaoContainer>

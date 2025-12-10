@@ -1,12 +1,20 @@
 import styled from "styled-components";
 
-export const DashBoardContainer = styled.div`
+interface DashBoardContainerProps {
+  $carregando?: boolean;
+}
+
+export const DashBoardContainer = styled.div<DashBoardContainerProps>`
     display: flex;
     min-height: 100vh;
     align-items: stretch;
     @media (max-width: 1260px) {
         display: initial;
     }
+    ${props => props.$carregando && `
+        pointer-events: none;
+        user-select: none;
+    `}
 `;
 
 export const DashboardMainCadastro = styled.main`
@@ -225,4 +233,44 @@ export const BotaoAcao = styled.button`
     font-size: 15px;
     padding: 9px 0;
   }
+`;
+
+export const EditarButton = styled.button<{ $loading?: boolean }>`
+    background-color: #37474f;
+    padding: 10px 0;
+    width: 270px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    font-family: var(--fonte-principal);
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      background-color: #455a64;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    @media (max-width: 760px) {
+      width: 250px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 600px) {
+      width: 200px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 460px) {
+      width: 190px;
+      font-size: 15px;
+      padding: 9px 0;
+    }
+  
+    ${props => props.$loading && `
+        opacity: 0.8;
+        cursor: wait;
+    `}
 `;

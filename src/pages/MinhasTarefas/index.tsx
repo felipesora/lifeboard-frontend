@@ -29,12 +29,14 @@ import ModalDeletarTarefa from '../../components/ModalDeletarTarefa';
 import Cabecalho from "../../components/Cabecalho";
 import { obterTarefas } from '../../utils/obterTarefas';
 import type { TarefaResponse } from '../../types/tarefa';
+import LoadingTelaCheia from '../../components/LoadingTelaCheia';
 
 const MinhasTarefas = () => {
   useAuthRedirect();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const [carregando, setCarregando] = useState<boolean>(true);
   const [todasTarefas, setTodasTarefas] = useState<TarefaResponse[]>([]);
   const [tarefas, setTarefas] = useState<TarefaResponse[]>([]);
   const [status, setStatus] = useState<string>('');
@@ -64,6 +66,7 @@ const MinhasTarefas = () => {
   useEffect(() => {
     const fetchDadosUsuario = async () => {
       try {
+        setCarregando(true);
         const tarefas = await obterTarefas();
         const tarefasOrdenadas = ordenarTarefas(tarefas);
 
@@ -71,6 +74,8 @@ const MinhasTarefas = () => {
         setTarefas(tarefasOrdenadas);
       } catch (erro) {
         console.error("Erro ao obter dados do usuário:", erro);
+      } finally {
+        setCarregando(false);
       }
     };
     fetchDadosUsuario();
@@ -181,151 +186,159 @@ const MinhasTarefas = () => {
   };
 
   return (
-    <DashBoardContainer>
-      <Cabecalho />
-      <MenuLateral />
-      <DashboardMainMinhasTarefas>
-        <p>Minhas tarefas</p>
+    <>
+      <LoadingTelaCheia carregando={carregando}/>
+      
+      <DashBoardContainer $carregando={carregando}>
+        <Cabecalho />
+        <MenuLateral />
+        <DashboardMainMinhasTarefas>
+          <p>Minhas tarefas</p>
 
-        <MinhasTarefasContainer>
-          <MinhasTarefasForm>
-            <FiltrosMinhasTarefasContainer>
-              <FiltroMinhasTarefas>
-                <label htmlFor="tipoTransacao">Status:</label>
-                <select
-                  id="tipoTransacao"
-                  name="tipoTransacao"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                >
-                  <option value="" disabled>Selecione um status</option>
-                  <option value="A_FAZER">A fazer</option>
-                  <option value="EM_ANDAMENTO">Em andamento</option>
-                  <option value="CONCLUIDA">Concluída</option>
-                </select>
-              </FiltroMinhasTarefas>
+          <MinhasTarefasContainer>
+            <MinhasTarefasForm>
+              <FiltrosMinhasTarefasContainer>
+                <FiltroMinhasTarefas>
+                  <label htmlFor="tipoTransacao">Status:</label>
+                  <select
+                    id="tipoTransacao"
+                    name="tipoTransacao"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option value="" disabled>Selecione um status</option>
+                    <option value="A_FAZER">A fazer</option>
+                    <option value="EM_ANDAMENTO">Em andamento</option>
+                    <option value="CONCLUIDA">Concluída</option>
+                  </select>
+                </FiltroMinhasTarefas>
 
-              <FiltroMinhasTarefas>
-                <label htmlFor="dataFim">Data limite:</label>
-                <input
-                  id="dataFim"
-                  type="date"
-                  name="dataFim"
-                  value={dataLimite}
-                  onChange={(e) => setDataLimite(e.target.value)}
-                />
-              </FiltroMinhasTarefas>
+                <FiltroMinhasTarefas>
+                  <label htmlFor="dataFim">Data limite:</label>
+                  <input
+                    id="dataFim"
+                    type="date"
+                    name="dataFim"
+                    value={dataLimite}
+                    onChange={(e) => setDataLimite(e.target.value)}
+                  />
+                </FiltroMinhasTarefas>
 
-              <FiltroMinhasTarefas>
-                <label htmlFor="categoria">Prioridade:</label>
-                <select
-                  id="categoria"
-                  name="categoria"
-                  value={prioridade}
-                  onChange={(e) => setPrioridade(e.target.value)}
-                >
-                  <option value="" disabled>Selecione uma prioridade</option>
-                  <option value="BAIXA">Baixa</option>
-                  <option value="MEDIA">Média</option>
-                  <option value="ALTA">Alta</option>
-                </select>
-              </FiltroMinhasTarefas>
-            </FiltrosMinhasTarefasContainer>
+                <FiltroMinhasTarefas>
+                  <label htmlFor="categoria">Prioridade:</label>
+                  <select
+                    id="categoria"
+                    name="categoria"
+                    value={prioridade}
+                    onChange={(e) => setPrioridade(e.target.value)}
+                  >
+                    <option value="" disabled>Selecione uma prioridade</option>
+                    <option value="BAIXA">Baixa</option>
+                    <option value="MEDIA">Média</option>
+                    <option value="ALTA">Alta</option>
+                  </select>
+                </FiltroMinhasTarefas>
+              </FiltrosMinhasTarefasContainer>
 
-            <BotoesFiltroContainer>
-              <BotaoFiltro type="button" onClick={aplicarFiltros}>
-                Filtrar
-              </BotaoFiltro>
-              <BotaoFiltro type="button" onClick={limparFiltros}>
-                Limpar Filtros
-              </BotaoFiltro>
-              <BotaoFiltro type="button" onClick={() => navigate("/cadastrar-tarefa", { state: { from: "minhas-tarefas" } })}>
-                Cadastrar Tarefa
-              </BotaoFiltro>
-            </BotoesFiltroContainer>
-          </MinhasTarefasForm>
+              <BotoesFiltroContainer>
+                <BotaoFiltro type="button" onClick={aplicarFiltros}>
+                  Filtrar
+                </BotaoFiltro>
+                <BotaoFiltro type="button" onClick={limparFiltros}>
+                  Limpar Filtros
+                </BotaoFiltro>
+                <BotaoFiltro type="button" onClick={() => navigate("/cadastrar-tarefa", { state: { from: "minhas-tarefas" } })}>
+                  Cadastrar Tarefa
+                </BotaoFiltro>
+              </BotoesFiltroContainer>
+            </MinhasTarefasForm>
 
-          <TabelaScrollWrapper>
-            <TabelaMinhasTarefas>
-              <thead>
-                <tr>
-                  <th>Título</th>
-                  <th>Descrição</th>
-                  <th>Prioridade</th>
-                  <th>Status</th>
-                  <th>Data Limite</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {tarefas.length > 0 ? (
-                  tarefas.map((tarefa, index) => {
-                    const isLastRows = index >= tarefas.length - 2;
-                    return (
-                      <tr key={tarefa.id_tarefa}>
-                        <td>{tarefa.titulo}</td>
-                        <td>{tarefa.descricao}</td>
-                        <PrioridadeCell prioridade={tarefa.prioridade}>
-                          {formatarPrioridade(tarefa.prioridade)}
-                        </PrioridadeCell>
-                        <td>{formatarStatus(tarefa.status)}</td>
-                        <td>{formatarDataISOParaBR(tarefa.data_limite)}</td>
-                        <CelulaAcoes>
-                          <div ref={tarefaSelecionada === tarefa.id_tarefa ? menuRef : null} style={{ display: 'inline-block' }}>
-                            <BotaoMenuTarefas onClick={() => setTarefaSelecionada(tarefa.id_tarefa)}>
-                              <img src={IconeMenuVertical} alt="Ícone de menu" />
-                            </BotaoMenuTarefas>
-                            {tarefaSelecionada === tarefa.id_tarefa && (
-                              <MenuTarefasDropdown isOpenUp={isLastRows}>
-                                <MenuItemTarefas onClick={() => handleEditar(tarefa.id_tarefa)}>
-                                  Editar
-                                </MenuItemTarefas>
-                                <MenuItemTarefas onClick={() => handleDeletar(tarefa.id_tarefa)}>
-                                  Deletar
-                                </MenuItemTarefas>
-                              </MenuTarefasDropdown>
-                            )}
-                          </div>
-                        </CelulaAcoes>
-                      </tr>
-                    );
-                  })
-                ) : (
+            <TabelaScrollWrapper>
+              <TabelaMinhasTarefas>
+                <thead>
                   <tr>
-                    <td colSpan={6}>Nenhuma tarefa encontrada.</td>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Prioridade</th>
+                    <th>Status</th>
+                    <th>Data Limite</th>
+                    <th></th>
                   </tr>
-                )}
-              </tbody>
-            </TabelaMinhasTarefas>
-          </TabelaScrollWrapper>
+                </thead>
+                <tbody>
+                  {tarefas.length > 0 ? (
+                    tarefas.map((tarefa, index) => {
+                      const isLastRows = index >= tarefas.length - 2;
+                      return (
+                        <tr key={tarefa.id_tarefa}>
+                          <td>{tarefa.titulo}</td>
+                          <td>{tarefa.descricao}</td>
+                          <PrioridadeCell prioridade={tarefa.prioridade}>
+                            {formatarPrioridade(tarefa.prioridade)}
+                          </PrioridadeCell>
+                          <td>{formatarStatus(tarefa.status)}</td>
+                          <td>{formatarDataISOParaBR(tarefa.data_limite)}</td>
+                          <CelulaAcoes>
+                            <div ref={tarefaSelecionada === tarefa.id_tarefa ? menuRef : null} style={{ display: 'inline-block' }}>
+                              <BotaoMenuTarefas onClick={() => setTarefaSelecionada(tarefa.id_tarefa)}>
+                                <img src={IconeMenuVertical} alt="Ícone de menu" />
+                              </BotaoMenuTarefas>
+                              {tarefaSelecionada === tarefa.id_tarefa && (
+                                <MenuTarefasDropdown isOpenUp={isLastRows}>
+                                  <MenuItemTarefas onClick={() => handleEditar(tarefa.id_tarefa)}>
+                                    Editar
+                                  </MenuItemTarefas>
+                                  <MenuItemTarefas onClick={() => handleDeletar(tarefa.id_tarefa)}>
+                                    Deletar
+                                  </MenuItemTarefas>
+                                </MenuTarefasDropdown>
+                              )}
+                            </div>
+                          </CelulaAcoes>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={6}>Nenhuma tarefa encontrada.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </TabelaMinhasTarefas>
+            </TabelaScrollWrapper>
 
-          <BotaoExcelContainer>
-            <BotaoExcel type="button" onClick={exportarTarefas}>
-              Exportar para Excel
-            </BotaoExcel>
-          </BotaoExcelContainer>
-        </MinhasTarefasContainer>
+            <BotaoExcelContainer>
+              <BotaoExcel type="button" onClick={exportarTarefas}>
+                Exportar para Excel
+              </BotaoExcel>
+            </BotaoExcelContainer>
+          </MinhasTarefasContainer>
 
-        <ModalDeletarTarefa
-          aberto={modalDelete}
-          onClose={() => setModalDelete(false)}
-          onDelete={async () => {
-            try {
-                if (idTarefaParaDeletar != null) {
-                    await deletarTarefa(idTarefaParaDeletar);
-                    const tarefasAtualizadas = await obterTarefas();
-                    setTarefas(tarefasAtualizadas);
-                    setModalDelete(false);
-                    setIdTarefaParaDeletar(null);
-                }
-            } catch (erro) {
-              console.error("Erro ao deletar tarefa:", erro);
-              alert("Erro ao deletar a tarefa. Por favor, tente novamente.");
-            }
-          }}
-        />
-      </DashboardMainMinhasTarefas>
-    </DashBoardContainer>
+          <ModalDeletarTarefa
+            aberto={modalDelete}
+            onClose={() => setModalDelete(false)}
+            onDelete={async () => {
+              try {
+                  if (idTarefaParaDeletar != null) {
+                      setCarregando(true);
+                      await deletarTarefa(idTarefaParaDeletar);
+                      const tarefasAtualizadas = await obterTarefas();
+                      setTarefas(tarefasAtualizadas);
+                      setModalDelete(false);
+                      setIdTarefaParaDeletar(null);
+                  }
+              } catch (erro) {
+                console.error("Erro ao deletar tarefa:", erro);
+                alert("Erro ao deletar a tarefa. Por favor, tente novamente.");
+              } finally {
+                setCarregando(false);
+              }
+            }}
+          />
+        </DashboardMainMinhasTarefas>
+      </DashBoardContainer>
+    </>
+
   );
 };
 

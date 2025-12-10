@@ -21,8 +21,10 @@ import {
   MensagemSucesso,
   MensagemErro,
   BotoesContainerTarefas,
-  BotaoAcaoTarefa
+  BotaoAcaoTarefa,
+  EditarButton
 } from "./styles";
+import LoadingTelaCheia from "../../components/LoadingTelaCheia";
 
 type Prioridade = "BAIXA" | "MEDIA" | "ALTA";
 type Status = "A_FAZER" | "EM_ANDAMENTO" | "CONCLUIDA";
@@ -35,6 +37,8 @@ const EditarTarefa = () => {
 
     const fromPage = location.state?.from || "tarefas-quadro-kanban";
 
+    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [tituloTarefa, setTituloTarefa] = useState<string>('');
     const [descricao, setDescricao] = useState<string>('');
     const [dataLimite, setDataLimite] = useState<string>('');
@@ -47,6 +51,7 @@ const EditarTarefa = () => {
     useEffect(() => {
         const fetchMeta = async () => {
             try {
+                setLoadingFetch(true);
                 const dados = await obterDadosTarefa(Number(id));
                 setTituloTarefa(dados.titulo);
                 setDescricao(dados.descricao);
@@ -57,6 +62,8 @@ const EditarTarefa = () => {
             } catch (erro) {
                 console.error(erro);
                 setError("Erro ao carregar dados da tarefa.");
+            } finally {
+                setLoadingFetch(false);
             }
         };
 
@@ -114,6 +121,8 @@ const EditarTarefa = () => {
         };
 
         try {
+            setLoading(true);
+
             await editarDadosTarefa(Number(id), tarefa);
 
             setError("");
@@ -128,112 +137,130 @@ const EditarTarefa = () => {
 
             setError("Erro ao editar a tarefa. Tente novamente.");
             setSuccess("");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <DashBoardContainer>
-            <Cabecalho />
-            <MenuLateral />
-            <DashboardMainCadastroTarefas>
-                <p>Minhas tarefas<span> {'>'} Editar Tarefa</span></p>
+        <>
+            <LoadingTelaCheia carregando={loadingFetch}/>
+            
+            <DashBoardContainer $carregando={loadingFetch}>
+                <Cabecalho />
+                <MenuLateral />
+                <DashboardMainCadastroTarefas>
+                    <p>Minhas tarefas<span> {'>'} Editar Tarefa</span></p>
 
-                <CadastroTarefasContainer>
+                    <CadastroTarefasContainer>
 
-                    <CadastroTarefasForm>
-                        <InputsContainerTarefa>
+                        <CadastroTarefasForm>
+                            <InputsContainerTarefa>
 
-                            <InputTituloTarefa>
-                                <InputLabel htmlFor="tituloTarefa">Título da Tarefa</InputLabel>
-                                <InputField
-                                    id="tituloTarefa"
-                                    type="text"
-                                    name="tituloTarefa"
-                                    placeholder='Ex: Arrumar a cama'
-                                    required
-                                    value={tituloTarefa}
-                                    onChange={(e) => setTituloTarefa(e.target.value)}
-                                />
-                            </InputTituloTarefa>
-
-                            <InputDescricaoTarefa>
-                                <InputLabel htmlFor="descricao">Descrição</InputLabel>
-                                <InputField
-                                    id="descricao"
-                                    type="text"
-                                    name="descricao"
-                                    required
-                                    value={descricao}
-                                    onChange={(e) => setDescricao(e.target.value)}
-                                />
-                            </InputDescricaoTarefa>
-
-                            <InputPrioridade>
-                                <InputLabel htmlFor="prioridade">Prioridade</InputLabel>
-                                <SelectField
-                                    id="prioridade"
-                                    name="prioridade"
-                                    required
-                                    value={prioridade}
-                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                                        setPrioridade(e.target.value as Prioridade)}
-                                >
-                                    <option value="" disabled>Selecione uma prioridade</option>
-                                    <option value="BAIXA">Baixa</option>
-                                    <option value="MEDIA">Média</option>
-                                    <option value="ALTA">Alta</option>
-                                    
-                                </SelectField>
-                            </InputPrioridade>
-
-                            <InputDataLimiteTarefa>
-                                <InputLabel htmlFor="dataLimite">Data Limite:</InputLabel>
-                                <InputField
-                                    id="dataLimite"
-                                    type="date"
-                                    name="dataLimite"
-                                    value={dataLimite}
-                                    onChange={(e) => setDataLimite(e.target.value)}
-                                />
-                            </InputDataLimiteTarefa>
-                            
-                            {fromPage === "minhas-tarefas" && ( 
-                            
-                                <InputPrioridade>
-                                    <InputLabel htmlFor="status">Status</InputLabel>
-                                    <SelectField
-                                        id="status"
-                                        name="status"
+                                <InputTituloTarefa>
+                                    <InputLabel htmlFor="tituloTarefa">Título da Tarefa</InputLabel>
+                                    <InputField
+                                        id="tituloTarefa"
+                                        type="text"
+                                        name="tituloTarefa"
+                                        placeholder='Ex: Arrumar a cama'
                                         required
-                                        value={status}
+                                        value={tituloTarefa}
+                                        onChange={(e) => setTituloTarefa(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                </InputTituloTarefa>
+
+                                <InputDescricaoTarefa>
+                                    <InputLabel htmlFor="descricao">Descrição</InputLabel>
+                                    <InputField
+                                        id="descricao"
+                                        type="text"
+                                        name="descricao"
+                                        required
+                                        value={descricao}
+                                        onChange={(e) => setDescricao(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                </InputDescricaoTarefa>
+
+                                <InputPrioridade>
+                                    <InputLabel htmlFor="prioridade">Prioridade</InputLabel>
+                                    <SelectField
+                                        id="prioridade"
+                                        name="prioridade"
+                                        required
+                                        value={prioridade}
+                                        disabled={loading}
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                                            setStatus(e.target.value as Status)}
+                                            setPrioridade(e.target.value as Prioridade)}
                                     >
-                                        <option value="" disabled>Selecione um status</option>
-                                        <option value="A_FAZER">A fazer</option>
-                                        <option value="EM_ANDAMENTO">Em andamento</option>
-                                        <option value="CONCLUIDA">Concluída</option>
+                                        <option value="" disabled>Selecione uma prioridade</option>
+                                        <option value="BAIXA">Baixa</option>
+                                        <option value="MEDIA">Média</option>
+                                        <option value="ALTA">Alta</option>
                                         
                                     </SelectField>
                                 </InputPrioridade>
-                            )}
-                            
 
-                        </InputsContainerTarefa>
+                                <InputDataLimiteTarefa>
+                                    <InputLabel htmlFor="dataLimite">Data Limite:</InputLabel>
+                                    <InputField
+                                        id="dataLimite"
+                                        type="date"
+                                        name="dataLimite"
+                                        value={dataLimite}
+                                        onChange={(e) => setDataLimite(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                </InputDataLimiteTarefa>
+                                
+                                {fromPage === "minhas-tarefas" && ( 
+                                
+                                    <InputPrioridade>
+                                        <InputLabel htmlFor="status">Status</InputLabel>
+                                        <SelectField
+                                            id="status"
+                                            name="status"
+                                            required
+                                            value={status}
+                                            disabled={loading}
+                                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                                                setStatus(e.target.value as Status)}
+                                        >
+                                            <option value="" disabled>Selecione um status</option>
+                                            <option value="A_FAZER">A fazer</option>
+                                            <option value="EM_ANDAMENTO">Em andamento</option>
+                                            <option value="CONCLUIDA">Concluída</option>
+                                            
+                                        </SelectField>
+                                    </InputPrioridade>
+                                )}
+                                
 
-                        <MensagensContainer>
-                            {success && <MensagemSucesso>{success}</MensagemSucesso>}
-                            {error && <MensagemErro>{error}</MensagemErro>}
-                        </MensagensContainer>
+                            </InputsContainerTarefa>
 
-                        <BotoesContainerTarefas>
-                            <BotaoAcaoTarefa onClick={() => navigate(fromPage === "tarefas-quadro-kanban" ? "/tarefas-quadro-kanban" : "/minhas-tarefas")}>Cancelar</BotaoAcaoTarefa>
-                            <BotaoAcaoTarefa onClick={handleEditarTarefa}>Editar Tarefa</BotaoAcaoTarefa>
-                        </BotoesContainerTarefas>
-                    </CadastroTarefasForm>
-                </CadastroTarefasContainer>
-            </DashboardMainCadastroTarefas>
-        </DashBoardContainer>
+                            <MensagensContainer>
+                                {success && <MensagemSucesso>{success}</MensagemSucesso>}
+                                {error && <MensagemErro>{error}</MensagemErro>}
+                            </MensagensContainer>
+
+                            <BotoesContainerTarefas>
+                                <BotaoAcaoTarefa onClick={() => navigate(fromPage === "tarefas-quadro-kanban" ? "/tarefas-quadro-kanban" : "/minhas-tarefas")}>Cancelar</BotaoAcaoTarefa>
+                                <EditarButton
+                                    type="button" 
+                                    onClick={handleEditarTarefa}
+                                    $loading={loading}
+                                    disabled={loading}
+                                    >
+                                    {loading ? 'Editando...' : 'Editar Tarefa'}
+                                </EditarButton>
+                            </BotoesContainerTarefas>
+                        </CadastroTarefasForm>
+                    </CadastroTarefasContainer>
+                </DashboardMainCadastroTarefas>
+            </DashBoardContainer>
+        </>
     )
 }
 

@@ -21,14 +21,18 @@ import {
   MensagemErro,
   BotoesContainer,
   BotaoAcao,
-  DashBoardContainer
+  DashBoardContainer,
+  EditarButton
 } from './styles';
+import LoadingTelaCheia from '../../components/LoadingTelaCheia';
 
 const EditarTransacao = () => {
     useAuthRedirect();
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [descricaoTransacao, setDescricaoTransacao] = useState<string>('');
     const [tipoTransacao, setTipoTransacao] = useState<"ENTRADA" | "SAIDA" | "APLICACAO" | "RESGATE" | "">("");
     const [categoriaTransacao, setCategoriaTransacao] = useState<"ALIMENTACAO" | "TRANSPORTE" | "MORADIA" | "LAZER" | "SALARIO" | "SAUDE" | "OUTROS" | "INVESTIMENTO" | "">("");
@@ -40,6 +44,7 @@ const EditarTransacao = () => {
     useEffect(() => {
         const fetchTransacao = async () => {
             try {
+                setLoadingFetch(true);
                 const dados = await obterDadosTransacao(Number(id));
                 setDescricaoTransacao(dados.descricao);
                 setCategoriaTransacao(dados.categoria);
@@ -49,6 +54,8 @@ const EditarTransacao = () => {
             } catch (erro) {
                 console.error(erro);
                 setError("Erro ao carregar dados da transação.");
+            } finally {
+                setLoadingFetch(false);
             }
         };
 
@@ -56,6 +63,8 @@ const EditarTransacao = () => {
     }, [id]);
 
     const handleEditarTransacao = async () => {
+        setError('');
+
         if (!descricaoTransacao.trim() || !categoriaTransacao || !tipoTransacao || !valorTransacao) {
             setError("Preencha todos os campos.");
             setSuccess("");
@@ -76,6 +85,7 @@ const EditarTransacao = () => {
         }
 
         try {
+            setLoading(true);
             await editarDadosTransacao(Number(id), {
                 descricao: descricaoTransacao,
                 valor: valorConvertido,
@@ -94,103 +104,118 @@ const EditarTransacao = () => {
             console.error(erro);
             setError("Erro ao editar a transação. Tente novamente.");
             setSuccess("");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <DashBoardContainer>
-        <Cabecalho />
-        <MenuLateral />
-        <DashboardMainCadastro>
-            <p>
-            Controle Financeiro {'>'} Transações <span> {'>'} Editar Transação</span>
-            </p>
+        <>
+        <LoadingTelaCheia carregando={loadingFetch}/>
 
-            <CadastroTransacaoContainer>
-            <CadastroForm>
-                <InputsContainer>
-                <InputDescricao>
-                    <InputLabel htmlFor="descricao">Descrição da Transação</InputLabel>
-                    <InputField
-                    id="descricao"
-                    type="text"
-                    name="descricao"
-                    placeholder="Ex: Celular"
-                    required
-                    value={descricaoTransacao}
-                    onChange={(e) => setDescricaoTransacao(e.target.value)}
-                    />
-                </InputDescricao>
+        <DashBoardContainer $carregando={loadingFetch}>
+            <Cabecalho />
+            <MenuLateral />
+            <DashboardMainCadastro>
+                <p>
+                Controle Financeiro {'>'} Transações <span> {'>'} Editar Transação</span>
+                </p>
 
-                <InputCategoria>
-                    <InputLabel htmlFor="categoria">Categoria</InputLabel>
-                    <SelectField
-                    id="categoria"
-                    name="categoria"
-                    required
-                    value={categoriaTransacao}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setCategoriaTransacao(e.target.value as typeof categoriaTransacao)}
-                    >
-                    <option value="" disabled>Selecione uma categoria</option>
-                    <option value="ALIMENTACAO">Alimentação</option>
-                    <option value="TRANSPORTE">Transporte</option>
-                    <option value="MORADIA">Moradia</option>
-                    <option value="LAZER">Lazer</option>
-                    <option value="SALARIO">Salário</option>
-                    <option value="SAUDE">Saúde</option>
-                    <option value="OUTROS">Outros</option>
-                    </SelectField>
-                </InputCategoria>
+                <CadastroTransacaoContainer>
+                <CadastroForm>
+                    <InputsContainer>
+                    <InputDescricao>
+                        <InputLabel htmlFor="descricao">Descrição da Transação</InputLabel>
+                        <InputField
+                        id="descricao"
+                        type="text"
+                        name="descricao"
+                        placeholder="Ex: Celular"
+                        required
+                        value={descricaoTransacao}
+                        onChange={(e) => setDescricaoTransacao(e.target.value)}
+                        disabled={loading}
+                        />
+                    </InputDescricao>
 
-                <InputTipo>
-                    <InputLabel htmlFor="tipoTransacao">Tipo</InputLabel>
-                    <SelectField
-                    id="tipoTransacao"
-                    name="tipoTransacao"
-                    required
-                    value={tipoTransacao}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setTipoTransacao(e.target.value as typeof tipoTransacao)}
-                    >
-                    <option value="" disabled>Selecione um tipo</option>
-                    <option value="ENTRADA">Entrada</option>
-                    <option value="SAIDA">Saída</option>
-                    </SelectField>
-                </InputTipo>
+                    <InputCategoria>
+                        <InputLabel htmlFor="categoria">Categoria</InputLabel>
+                        <SelectField
+                        id="categoria"
+                        name="categoria"
+                        required
+                        value={categoriaTransacao}
+                        disabled={loading}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                            setCategoriaTransacao(e.target.value as typeof categoriaTransacao)}
+                        >
+                        <option value="" disabled>Selecione uma categoria</option>
+                        <option value="ALIMENTACAO">Alimentação</option>
+                        <option value="TRANSPORTE">Transporte</option>
+                        <option value="MORADIA">Moradia</option>
+                        <option value="LAZER">Lazer</option>
+                        <option value="SALARIO">Salário</option>
+                        <option value="SAUDE">Saúde</option>
+                        <option value="OUTROS">Outros</option>
+                        </SelectField>
+                    </InputCategoria>
 
-                <InputValor>
-                    <InputLabel htmlFor="valor">Valor</InputLabel>
-                    <InputField
-                    id="valor"
-                    type="number"
-                    step="any"
-                    name="valor"
-                    placeholder="Ex: 1500,00"
-                    required
-                    value={valorTransacao}
-                    onChange={(e) => setValorTransacao(e.target.value)}
-                    />
-                </InputValor>
-                </InputsContainer>
+                    <InputTipo>
+                        <InputLabel htmlFor="tipoTransacao">Tipo</InputLabel>
+                        <SelectField
+                        id="tipoTransacao"
+                        name="tipoTransacao"
+                        required
+                        value={tipoTransacao}
+                        disabled={loading}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                            setTipoTransacao(e.target.value as typeof tipoTransacao)}
+                        >
+                        <option value="" disabled>Selecione um tipo</option>
+                        <option value="ENTRADA">Entrada</option>
+                        <option value="SAIDA">Saída</option>
+                        </SelectField>
+                    </InputTipo>
 
-                <MensagensContainer>
-                {success && <MensagemSucesso>{success}</MensagemSucesso>}
-                {error && <MensagemErro>{error}</MensagemErro>}
-                </MensagensContainer>
+                    <InputValor>
+                        <InputLabel htmlFor="valor">Valor</InputLabel>
+                        <InputField
+                        id="valor"
+                        type="number"
+                        step="any"
+                        name="valor"
+                        placeholder="Ex: 1500,00"
+                        required
+                        value={valorTransacao}
+                        onChange={(e) => setValorTransacao(e.target.value)}
+                        disabled={loading}
+                        />
+                    </InputValor>
+                    </InputsContainer>
 
-                <BotoesContainer>
-                <BotaoAcao type="button" onClick={() => navigate("/transacoes")}>
-                    Cancelar
-                </BotaoAcao>
-                <BotaoAcao type="button" onClick={handleEditarTransacao}>
-                    Editar Transação
-                </BotaoAcao>
-                </BotoesContainer>
-            </CadastroForm>
-            </CadastroTransacaoContainer>
-        </DashboardMainCadastro>
-        </DashBoardContainer>
+                    <MensagensContainer>
+                    {success && <MensagemSucesso>{success}</MensagemSucesso>}
+                    {error && <MensagemErro>{error}</MensagemErro>}
+                    </MensagensContainer>
+
+                    <BotoesContainer>
+                    <BotaoAcao type="button" onClick={() => navigate("/transacoes")}>
+                        Cancelar
+                    </BotaoAcao>
+                    <EditarButton 
+                        type="button" 
+                        onClick={handleEditarTransacao}
+                        $loading={loading}
+                        disabled={loading}
+                        >
+                        {loading ? 'Editando...' : 'Editar Transação'}
+                    </EditarButton>
+                    </BotoesContainer>
+                </CadastroForm>
+                </CadastroTransacaoContainer>
+            </DashboardMainCadastro>
+            </DashBoardContainer>
+        </>
     )
 }
 

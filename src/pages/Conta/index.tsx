@@ -33,11 +33,14 @@ import FotoPefilPadrao from "../../assets/images/foto-perfil-padrao.png";
 import IconeEditarFoto from "../../assets/images/icone-editar-foto-perfil.png";
 import IconeRemoverFoto from "../../assets/images/icone-remover-foto-perfil.png";
 import { atualizarFotoPefil, deletarUsuario, editarDadosUsuario, obterDadosUsuario, obterFotoPerfil, removerFotoPerfil } from '../../services/usuarioService';
+import LoadingTelaCheia from '../../components/LoadingTelaCheia';
 
 const Conta = () => {
   useAuthRedirect();
   const navigate = useNavigate();
 
+  const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [nome, setNome] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [fotoPerfil, setFotoPerfil] = useState<string | null>(null);
@@ -53,6 +56,7 @@ const Conta = () => {
   useEffect(() => {
     const fetchDadosUsuario = async () => {
       try {
+        setLoadingFetch(true);
         const id = localStorage.getItem("userId");
         if (!id) {
           throw new Error("ID do usuário não encontrado");
@@ -65,6 +69,8 @@ const Conta = () => {
         setEmailEditar(usuario.email);
       } catch (erro) {
         console.error("Erro ao obter dados do usuário:", erro);
+      } finally {
+        setLoadingFetch(false);
       }
     };
 
@@ -74,6 +80,8 @@ const Conta = () => {
   useEffect(() => {
     const fetchFotoPerfil = async () => {
       try {
+        setLoadingFetch(true);
+
         const blob = await obterFotoPerfil();
 
         if (blob instanceof Blob && blob.size > 0) {
@@ -85,6 +93,8 @@ const Conta = () => {
       } catch (error) {
         console.error("Erro ao carregar foto de perfil:", error);
         setFotoPerfil(FotoPefilPadrao);
+      } finally {
+        setLoadingFetch(false);
       }
     };
 
@@ -112,16 +122,20 @@ const Conta = () => {
     formData.append("file", file);
 
     try {
+      setLoadingFetch(true);
       await atualizarFotoPefil(formData);
       const novaImagem = URL.createObjectURL(file);
       setFotoPerfil(novaImagem);
     } catch (error) {
       console.error("Erro ao enviar imagem:", error);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
   const handleRemoverFoto = async () => {
     try {
+      setLoadingFetch(true);
       if (fotoPerfil && fotoPerfil.startsWith('blob:')) {
         URL.revokeObjectURL(fotoPerfil);
       }
@@ -130,11 +144,15 @@ const Conta = () => {
       setFotoPerfil(FotoPefilPadrao);
     } catch (error) {
       console.error("Erro ao remover foto: ", error);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
   const handleEditarConta = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setError('');
 
     if (!nomeEditar || !emailEditar || !senhaEditar || !senhaConfirmarEditar) {
       setError("Preencha todos os campos.");
@@ -161,6 +179,7 @@ const Conta = () => {
     };
 
     try {
+      setLoading(true);
       const id = localStorage.getItem("userId");
       if (!id) {
         throw new Error("ID do usuário não encontrado");
@@ -179,6 +198,8 @@ const Conta = () => {
       console.log(erro);
       setError("Erro ao editar os dados. Tente novamente.");
       setSuccess("");
+    } finally {
+      setLoading(true);
     }
   };
 
@@ -189,6 +210,7 @@ const Conta = () => {
     }
 
     try {
+      setLoadingFetch(true);
       const id = localStorage.getItem("userId");
       if (!id) {
         throw new Error("ID do usuário não encontrado");
@@ -200,6 +222,8 @@ const Conta = () => {
     } catch (error) {
       console.error("Erro ao deletar conta:", error);
       alert("Erro ao deletar conta. Tente novamente.");
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
@@ -208,140 +232,144 @@ const Conta = () => {
   };
 
   return (
-    <DashBoardContainer>
-      <Cabecalho />
-      <MenuLateral />
-      <DashboardMainConta>
-        <p>Minha Conta</p>
+    <>
+      <LoadingTelaCheia carregando={loadingFetch}/>
 
-        <ContaContainer>
-          <DadosConta>
-            <FotoPerfilContainer>
-              {fotoPerfil ? (
-                <FotoPerfilConteudo>
-                  <FotoPerfil 
-                    src={fotoPerfil} 
-                    alt="Foto de perfil" 
-                    onError={handleFotoError}
+      <DashBoardContainer $carregando={loadingFetch}>
+        <Cabecalho />
+        <MenuLateral />
+        <DashboardMainConta>
+          <p>Minha Conta</p>
+
+          <ContaContainer>
+            <DadosConta>
+              <FotoPerfilContainer>
+                {fotoPerfil ? (
+                  <FotoPerfilConteudo>
+                    <FotoPerfil 
+                      src={fotoPerfil} 
+                      alt="Foto de perfil" 
+                      onError={handleFotoError}
+                    />
+
+                    <BotaoEditarFoto htmlFor="inputFotoPerfil" title="Atualizar Foto de Perfil">
+                      <img src={IconeEditarFoto} alt="Ícone de editar" />
+                    </BotaoEditarFoto>
+
+                    <InputFotoPerfil
+                      type="file"
+                      id="inputFotoPerfil"
+                      accept="image/*"
+                      onChange={handleAtualzarFoto}
+                    />
+
+                    <BotaoRemoverFoto 
+                      onClick={handleRemoverFoto} 
+                      title="Remover Foto de Perfil"
+                      type="button"
+                    >
+                      <img src={IconeRemoverFoto} alt="ícone de remover foto" />
+                    </BotaoRemoverFoto>
+                  </FotoPerfilConteudo>
+                ) : (
+                  <FotoPerfilConteudo>
+                    <FotoPerfil 
+                      src={FotoPefilPadrao} 
+                      alt="Foto de perfil padrão" 
+                    />
+                    <p>Carregando imagem...</p>
+                  </FotoPerfilConteudo>
+                )}
+              </FotoPerfilContainer>
+
+              <div>
+                <p>Nome: <span>{nome}</span></p>
+              </div>
+
+              <div>
+                <p>Email: <span>{email}</span></p>
+              </div>
+
+              <div>
+                <p>Senha: <span>********</span></p>
+              </div>
+            </DadosConta>  
+
+            <ContainerEditarConta>
+              <h2>Quer editar seus dados?</h2>
+
+              <FormEditarConta onSubmit={handleEditarConta}>
+                <InputEditarConta>
+                  <InputLabel htmlFor="nome">Nome:</InputLabel>
+                  <InputField
+                    type="text"
+                    id="nome"
+                    value={nomeEditar}
+                    onChange={(e) => setNomeEditar(e.target.value)}
                   />
+                </InputEditarConta>
 
-                  <BotaoEditarFoto htmlFor="inputFotoPerfil" title="Atualizar Foto de Perfil">
-                    <img src={IconeEditarFoto} alt="Ícone de editar" />
-                  </BotaoEditarFoto>
-
-                  <InputFotoPerfil
-                    type="file"
-                    id="inputFotoPerfil"
-                    accept="image/*"
-                    onChange={handleAtualzarFoto}
+                <InputEditarConta>
+                  <InputLabel htmlFor="email">Email:</InputLabel>
+                  <InputField
+                    type="email"
+                    id="email"
+                    value={emailEditar}
+                    onChange={(e) => setEmailEditar(e.target.value)}
                   />
+                </InputEditarConta>
 
-                  <BotaoRemoverFoto 
-                    onClick={handleRemoverFoto} 
-                    title="Remover Foto de Perfil"
-                    type="button"
-                  >
-                    <img src={IconeRemoverFoto} alt="ícone de remover foto" />
-                  </BotaoRemoverFoto>
-                </FotoPerfilConteudo>
-              ) : (
-                <FotoPerfilConteudo>
-                  <FotoPerfil 
-                    src={FotoPefilPadrao} 
-                    alt="Foto de perfil padrão" 
+                <InputEditarConta>
+                  <InputLabel htmlFor="senha">Nova senha:</InputLabel>
+                  <InputField
+                    type="password"
+                    id="senha"
+                    value={senhaEditar}
+                    onChange={(e) => setSenhaEditar(e.target.value)}
                   />
-                  <p>Carregando imagem...</p>
-                </FotoPerfilConteudo>
-              )}
-            </FotoPerfilContainer>
+                </InputEditarConta>
 
-            <div>
-              <p>Nome: <span>{nome}</span></p>
-            </div>
+                <InputEditarConta>
+                  <InputLabel htmlFor="senhaCorfirmar">Confirmar senha:</InputLabel>
+                  <InputField
+                    type="password"
+                    id="senhaCorfirmar"
+                    value={senhaConfirmarEditar}
+                    onChange={(e) => setSenhaConfirmarEditar(e.target.value)}
+                  />
+                </InputEditarConta>
 
-            <div>
-              <p>Email: <span>{email}</span></p>
-            </div>
+                <MensagensContainer>
+                  {success && <MensagemSucesso>{success}</MensagemSucesso>}
+                  {error && <MensagemErro>{error}</MensagemErro>}
+                </MensagensContainer>
 
-            <div>
-              <p>Senha: <span>********</span></p>
-            </div>
-          </DadosConta>  
+                <BotaoEditarConta>
+                  <BotaoSalvar type="submit" $loading={loading} disabled={loading}>{loading ? 'Salvando...' : 'Salvar Alterações'}</BotaoSalvar>
+                </BotaoEditarConta>
+              </FormEditarConta>
+            </ContainerEditarConta>
 
-          <ContainerEditarConta>
-            <h2>Quer editar seus dados?</h2>
+            <BotaoExcluirContaContainer>
+              <BotaoExcluirConta 
+                type="button" 
+                onClick={() => setModalContaAberto(true)}
+              >
+                Excluir Conta
+              </BotaoExcluirConta>
+            </BotaoExcluirContaContainer>
+          </ContaContainer>
 
-            <FormEditarConta onSubmit={handleEditarConta}>
-              <InputEditarConta>
-                <InputLabel htmlFor="nome">Nome:</InputLabel>
-                <InputField
-                  type="text"
-                  id="nome"
-                  value={nomeEditar}
-                  onChange={(e) => setNomeEditar(e.target.value)}
-                />
-              </InputEditarConta>
-
-              <InputEditarConta>
-                <InputLabel htmlFor="email">Email:</InputLabel>
-                <InputField
-                  type="email"
-                  id="email"
-                  value={emailEditar}
-                  onChange={(e) => setEmailEditar(e.target.value)}
-                />
-              </InputEditarConta>
-
-              <InputEditarConta>
-                <InputLabel htmlFor="senha">Nova senha:</InputLabel>
-                <InputField
-                  type="password"
-                  id="senha"
-                  value={senhaEditar}
-                  onChange={(e) => setSenhaEditar(e.target.value)}
-                />
-              </InputEditarConta>
-
-              <InputEditarConta>
-                <InputLabel htmlFor="senhaCorfirmar">Confirmar senha:</InputLabel>
-                <InputField
-                  type="password"
-                  id="senhaCorfirmar"
-                  value={senhaConfirmarEditar}
-                  onChange={(e) => setSenhaConfirmarEditar(e.target.value)}
-                />
-              </InputEditarConta>
-
-              <MensagensContainer>
-                {success && <MensagemSucesso>{success}</MensagemSucesso>}
-                {error && <MensagemErro>{error}</MensagemErro>}
-              </MensagensContainer>
-
-              <BotaoEditarConta>
-                <BotaoSalvar type="submit">Salvar Alterações</BotaoSalvar>
-              </BotaoEditarConta>
-            </FormEditarConta>
-          </ContainerEditarConta>
-
-          <BotaoExcluirContaContainer>
-            <BotaoExcluirConta 
-              type="button" 
-              onClick={() => setModalContaAberto(true)}
-            >
-              Excluir Conta
-            </BotaoExcluirConta>
-          </BotaoExcluirContaContainer>
-        </ContaContainer>
-
-        <ModalDeletarConta
-          aberto={modalContaAberto}
-          onClose={() => setModalContaAberto(false)}
-          onDelete={handleDeletarConta}
-          confirmarExclusao={confirmarExclusao}
-          setConfirmarExclusao={setConfirmarExclusao}
-        />
-      </DashboardMainConta>
-    </DashBoardContainer>
+          <ModalDeletarConta
+            aberto={modalContaAberto}
+            onClose={() => setModalContaAberto(false)}
+            onDelete={handleDeletarConta}
+            confirmarExclusao={confirmarExclusao}
+            setConfirmarExclusao={setConfirmarExclusao}
+          />
+        </DashboardMainConta>
+      </DashBoardContainer>
+    </>
   );
 };
 

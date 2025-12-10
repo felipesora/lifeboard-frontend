@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { login } from './services/loginService';
 import { isTokenValid } from '../../services/authService';
-import { ContainerLogin, LinkPaginaCadastro, MensagemLogin, SecaoLogin } from './styles';
+import { ContainerLogin, LinkPaginaCadastro, LoginButton, MensagemLogin, SecaoLogin } from './styles';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -17,19 +17,21 @@ const Login = () => {
     const [email, setEmail] = useState<string>("");
     const [senha, setSenha] = useState<string>("");
     const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
 
         try {
             await login(email, senha);
-
-            setError('');
             navigate('/controle-financeiro');
-
         } catch (erro) {
             console.log(erro);
             setError('Email ou senha inválidos.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -52,6 +54,7 @@ const Login = () => {
                             required
                             onChange={(e) => setEmail(e.target.value)}
                             value={email}
+                            disabled={loading}
                         />
                     </div>
 
@@ -63,13 +66,19 @@ const Login = () => {
                             required
                             onChange={(e) => setSenha(e.target.value)}
                             value={senha}
+                            disabled={loading}
                         />
                     </div>
 
                     <div>
-                        <button type="submit">Entrar</button>
+                        <LoginButton 
+                            type="submit" 
+                            $loading={loading}
+                            disabled={loading || !email || !senha}
+                        >
+                            {loading ? 'Entrando...' : 'Entrar'}
+                        </LoginButton>
                     </div>
-
                 </form>
 
                 <MensagemLogin>
@@ -77,9 +86,15 @@ const Login = () => {
                 </MensagemLogin>
 
                 <LinkPaginaCadastro>
-                    <p className="link">Ainda não possui uma conta? <button onClick={() => navigate("/cadastro")}>Cadastre-se</button></p>
+                    <p className="link">Ainda não possui uma conta? 
+                        <button 
+                            onClick={() => navigate("/cadastro")}
+                            disabled={loading}
+                        >
+                            Cadastre-se
+                        </button>
+                    </p>
                 </LinkPaginaCadastro>
-
             </SecaoLogin>
         </ContainerLogin>
     )

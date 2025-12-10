@@ -25,11 +25,13 @@ import ModalDeletarMeta from './components/ModalDeletarMeta';
 import ModalRetirarSaldoMeta from './components/ModalRetirarSaldoMeta';
 import type { MetaResponse } from '../../types/meta';
 import { adicionarSaldo, deletarMeta, retirarSaldo } from '../../services/metaService';
+import LoadingTelaCheia from '../../components/LoadingTelaCheia';
 
 const Metas = () => {
   useAuthRedirect();
   const navigate = useNavigate();
 
+  const [carregando, setCarregando] = useState<boolean>(true);
   const [statusMeta, setStatusMeta] = useState<string>('');
   const [dataLimiteMeta, setDataLimiteMeta] = useState<string>('');
   const [todasMetas, setTodasMetas] = useState<MetaResponse[]>([]);
@@ -46,11 +48,15 @@ const Metas = () => {
   useEffect(() => {
     const fetchDadosUsuario = async () => {
       try {
+        setCarregando(true);
+
         const metas = await obterMetas();
         setTodasMetas(metas);
         setMetas(metas);
       } catch (erro) {
         console.error("Erro ao obter dados do usuário:", erro);
+      } finally {
+        setCarregando(false);
       }
     };
 
@@ -113,149 +119,162 @@ const Metas = () => {
   };
 
   return (
-    <DashBoardContainer>
-      <Cabecalho />
-      <MenuLateral />
-      <DashboardMainMetas>
-        <p>
-          Controle Financeiro <span> {'>'} Metas</span>
-        </p>
+    <>
+      <LoadingTelaCheia  carregando={carregando}/>
 
-        <MetasContainer>
-          <MetasForm>
-            <FiltrosMetasContainer>
-              <FiltroMeta>
-                <label htmlFor="statusMeta">Status:</label>
-                <select
-                  id="statusMeta"
-                  name="statusMeta"
-                  value={statusMeta}
-                  onChange={(e) => setStatusMeta(e.target.value)}
-                >
-                  <option value="" disabled>Selecione um Status</option>
-                  <option value="EM_ANDAMENTO">Em Andamento</option>
-                  <option value="CONCLUIDA">Concluída</option>
-                </select>
-              </FiltroMeta>
+      <DashBoardContainer $carregando={carregando}>
+        <Cabecalho />
+        <MenuLateral />
+        <DashboardMainMetas>
+          <p>
+            Controle Financeiro <span> {'>'} Metas</span>
+          </p>
 
-              <FiltroMeta>
-                <label htmlFor="dataLimite">Data Limite:</label>
-                <input
-                  id="dataLimite"
-                  type="date"
-                  name="dataLimite"
-                  value={dataLimiteMeta}
-                  onChange={(e) => setDataLimiteMeta(e.target.value)}
-                />
-              </FiltroMeta>
-            </FiltrosMetasContainer>
+          <MetasContainer>
+            <MetasForm>
+              <FiltrosMetasContainer>
+                <FiltroMeta>
+                  <label htmlFor="statusMeta">Status:</label>
+                  <select
+                    id="statusMeta"
+                    name="statusMeta"
+                    value={statusMeta}
+                    onChange={(e) => setStatusMeta(e.target.value)}
+                  >
+                    <option value="" disabled>Selecione um Status</option>
+                    <option value="EM_ANDAMENTO">Em Andamento</option>
+                    <option value="CONCLUIDA">Concluída</option>
+                  </select>
+                </FiltroMeta>
 
-            <BotoesFiltroContainer>
-              <BotaoFiltro type="button" onClick={aplicarFiltros}>
-                Filtrar
-              </BotaoFiltro>
-              <BotaoFiltro type="button" onClick={limparFiltros}>
-                Limpar Filtros
-              </BotaoFiltro>
-              <BotaoFiltro type="button" onClick={() => navigate("/cadastrar-meta")}>
-                Nova Meta
-              </BotaoFiltro>
-            </BotoesFiltroContainer>
-          </MetasForm>
+                <FiltroMeta>
+                  <label htmlFor="dataLimite">Data Limite:</label>
+                  <input
+                    id="dataLimite"
+                    type="date"
+                    name="dataLimite"
+                    value={dataLimiteMeta}
+                    onChange={(e) => setDataLimiteMeta(e.target.value)}
+                  />
+                </FiltroMeta>
+              </FiltrosMetasContainer>
 
-          <CardsMetasContainer>
-            {metas.length > 0 ? (
-              ordenarMetas(metas).map((meta) => (
-                <CardMeta
-                  key={meta.id_meta}
-                  idMeta={meta.id_meta}
-                  iconeMeta={meta.status === "EM_ANDAMENTO" ? IconeMetaAndamento : IconeMetaConcluida}
-                  nomeMeta={meta.nome}
-                  valorMeta={meta.valor_meta.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                  valorAtual={meta.valor_atual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                  valorMetaNum={meta.valor_meta}
-                  valorAtualNum={meta.valor_atual}
-                  dataLimite={formatarDataISOParaBR(meta.data_limite)}
-                  onDeletar={handleDeletar}
-                  onAdicionarSaldo={handleAdicionarSaldo}
-                  onRetirarSaldo={handleRetirarSaldo}
-                />
-              ))
-            ) : (
-              <MensagemSemMetas>Nenhuma meta encontrada.</MensagemSemMetas>
-            )}
-          </CardsMetasContainer>
-        </MetasContainer>
+              <BotoesFiltroContainer>
+                <BotaoFiltro type="button" onClick={aplicarFiltros}>
+                  Filtrar
+                </BotaoFiltro>
+                <BotaoFiltro type="button" onClick={limparFiltros}>
+                  Limpar Filtros
+                </BotaoFiltro>
+                <BotaoFiltro type="button" onClick={() => navigate("/cadastrar-meta")}>
+                  Nova Meta
+                </BotaoFiltro>
+              </BotoesFiltroContainer>
+            </MetasForm>
 
-        <ModalDeletarMeta
-          aberto={modalDelete}
-          onClose={() => setModalDelete(false)}
-          onDelete={async () => {
-            try {
-              if (idMetaParaDeletar !== null) {
-                  await deletarMeta(idMetaParaDeletar);
+            <CardsMetasContainer>
+              {metas.length > 0 ? (
+                ordenarMetas(metas).map((meta) => (
+                  <CardMeta
+                    key={meta.id_meta}
+                    idMeta={meta.id_meta}
+                    iconeMeta={meta.status === "EM_ANDAMENTO" ? IconeMetaAndamento : IconeMetaConcluida}
+                    nomeMeta={meta.nome}
+                    valorMeta={meta.valor_meta.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    valorAtual={meta.valor_atual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    valorMetaNum={meta.valor_meta}
+                    valorAtualNum={meta.valor_atual}
+                    dataLimite={formatarDataISOParaBR(meta.data_limite)}
+                    onDeletar={handleDeletar}
+                    onAdicionarSaldo={handleAdicionarSaldo}
+                    onRetirarSaldo={handleRetirarSaldo}
+                  />
+                ))
+              ) : (
+                <MensagemSemMetas>Nenhuma meta encontrada.</MensagemSemMetas>
+              )}
+            </CardsMetasContainer>
+          </MetasContainer>
+
+          <ModalDeletarMeta
+            aberto={modalDelete}
+            onClose={() => setModalDelete(false)}
+            onDelete={async () => {
+              try {
+                if (idMetaParaDeletar !== null) {
+                    setCarregando(true);
+                    await deletarMeta(idMetaParaDeletar);
+                    const metasAtualizadas = await obterMetas();
+                    setMetas(metasAtualizadas);
+                    setModalDelete(false);
+                    setIdMetaParaDeletar(null);
+                }
+              } catch (erro) {
+                console.error("Erro ao deletar meta:", erro);
+              } finally {
+                setCarregando(false);
+              }
+            }}
+          />
+
+          <ModalAdicionarSaldoMeta
+            aberto={modalAdicionar}
+            onClose={() => {
+              setModalAdicionar(false);
+              setValorAdicionar('');
+            }}
+            valorAdicionar={valorAdicionar}
+            setValorAdicionar={setValorAdicionar}
+            onAdicionar={async () => {
+              try {
+                if (idMetaParaAdicionar !== null) {
+                  setCarregando(true);
+                  await adicionarSaldo(idMetaParaAdicionar, Number(valorAdicionar));
                   const metasAtualizadas = await obterMetas();
                   setMetas(metasAtualizadas);
-                  setModalDelete(false);
-                  setIdMetaParaDeletar(null);
-              }
-            } catch (erro) {
-              console.error("Erro ao deletar meta:", erro);
-            }
-          }}
-        />
-
-        <ModalAdicionarSaldoMeta
-          aberto={modalAdicionar}
-          onClose={() => {
-            setModalAdicionar(false);
-            setValorAdicionar('');
-          }}
-          valorAdicionar={valorAdicionar}
-          setValorAdicionar={setValorAdicionar}
-          onAdicionar={async () => {
-            try {
-              if (idMetaParaAdicionar !== null) {
-                await adicionarSaldo(idMetaParaAdicionar, Number(valorAdicionar));
-                const metasAtualizadas = await obterMetas();
-                setMetas(metasAtualizadas);
-                setModalAdicionar(false);
-                setIdMetaParaAdicionar(null);
-                setValorAdicionar('');
-              }
-            } catch (erro) {
-              console.error("Erro ao adicionar saldo na meta:", erro);
-              throw erro;
-            }
-          }}
-        />
-
-        <ModalRetirarSaldoMeta
-          aberto={modalRetirar}
-          onClose={() => {
-            setModalRetirar(false);
-            setValorAdicionar('');
-          }}
-          valorRetirar={valorRetirar}
-          setValorRetirar={setValorRetirar}
-          onRetirar={async () => {
-            try {
-              if (idMetaParaAdicionar !== null) {
-                  await retirarSaldo(idMetaParaAdicionar, Number(valorRetirar));
-                  const metasAtualizadas = await obterMetas();
-                  setMetas(metasAtualizadas);
-                  setModalRetirar(false);
+                  setModalAdicionar(false);
                   setIdMetaParaAdicionar(null);
-                  setValorRetirar('');
+                  setValorAdicionar('');
+                }
+              } catch (erro) {
+                console.error("Erro ao adicionar saldo na meta:", erro);
+                throw erro;
+              } finally {
+                setCarregando(false);
               }
-            } catch (erro) {
-              console.error("Erro ao retirar saldo na meta:", erro);
-              throw erro;
-            }
-          }}
-        />
-      </DashboardMainMetas>
-    </DashBoardContainer>
+            }}
+          />
+
+          <ModalRetirarSaldoMeta
+            aberto={modalRetirar}
+            onClose={() => {
+              setModalRetirar(false);
+              setValorAdicionar('');
+            }}
+            valorRetirar={valorRetirar}
+            setValorRetirar={setValorRetirar}
+            onRetirar={async () => {
+              try {
+                if (idMetaParaAdicionar !== null) {
+                    setCarregando(true);
+                    await retirarSaldo(idMetaParaAdicionar, Number(valorRetirar));
+                    const metasAtualizadas = await obterMetas();
+                    setMetas(metasAtualizadas);
+                    setModalRetirar(false);
+                    setIdMetaParaAdicionar(null);
+                    setValorRetirar('');
+                }
+              } catch (erro) {
+                console.error("Erro ao retirar saldo na meta:", erro);
+                throw erro;
+              } finally {
+                setCarregando(false);
+              }
+            }}
+          />
+        </DashboardMainMetas>
+      </DashBoardContainer>
+    </>
   );
 };
 
