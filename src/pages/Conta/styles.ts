@@ -240,7 +240,7 @@ export const BotaoEditarConta = styled.div`
   margin-top: 13px;
 `;
 
-export const BotaoSalvar = styled.button`
+export const BotaoSalvar = styled.button<{ $loading?: boolean }>`
   background-color: var(--cor-principal);
   padding: 10px 0;
   font-size: 16px;
@@ -262,6 +262,11 @@ export const BotaoSalvar = styled.button`
     font-size: 15px;
     width: 190px;
   }
+
+  ${props => props.$loading && `
+        opacity: 0.8;
+        cursor: wait;
+  `}
 `;
 
 export const BotaoExcluirContaContainer = styled.div`

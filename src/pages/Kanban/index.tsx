@@ -86,6 +86,7 @@ const Kanban = () => {
 
   const moverTarefa = async (tarefa: TarefaResponse, novoStatus: string) => {
     try {
+      setCarregando(true);
       const tarefaEditDTO: TarefaEditDTO = {
         titulo: tarefa.titulo,
         descricao: tarefa.descricao,
@@ -104,6 +105,8 @@ const Kanban = () => {
       ));
     } catch (erro) {
       console.error("Erro ao mover tarefa:", erro);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -268,6 +271,7 @@ const Kanban = () => {
             onDelete={async () => {
               try {
                 if (idTarefaDeletar != null) {
+                  setCarregando(true);
                   await deletarTarefa(idTarefaDeletar);
                   const tarefasAtualizadas = await obterTarefas();
                   setTarefas(tarefasAtualizadas);
@@ -277,6 +281,8 @@ const Kanban = () => {
               } catch (erro) {
                 console.error("Erro ao deletar tarefa:", erro);
                 alert("Erro ao deletar a tarefa. Por favor, tente novamente.");
+              } finally {
+                setCarregando(false);
               }
             }}
           />

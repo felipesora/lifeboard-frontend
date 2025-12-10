@@ -202,6 +202,7 @@ const Metas = () => {
             onDelete={async () => {
               try {
                 if (idMetaParaDeletar !== null) {
+                    setCarregando(true);
                     await deletarMeta(idMetaParaDeletar);
                     const metasAtualizadas = await obterMetas();
                     setMetas(metasAtualizadas);
@@ -210,6 +211,8 @@ const Metas = () => {
                 }
               } catch (erro) {
                 console.error("Erro ao deletar meta:", erro);
+              } finally {
+                setCarregando(false);
               }
             }}
           />
@@ -225,6 +228,7 @@ const Metas = () => {
             onAdicionar={async () => {
               try {
                 if (idMetaParaAdicionar !== null) {
+                  setCarregando(true);
                   await adicionarSaldo(idMetaParaAdicionar, Number(valorAdicionar));
                   const metasAtualizadas = await obterMetas();
                   setMetas(metasAtualizadas);
@@ -235,6 +239,8 @@ const Metas = () => {
               } catch (erro) {
                 console.error("Erro ao adicionar saldo na meta:", erro);
                 throw erro;
+              } finally {
+                setCarregando(false);
               }
             }}
           />
@@ -250,6 +256,7 @@ const Metas = () => {
             onRetirar={async () => {
               try {
                 if (idMetaParaAdicionar !== null) {
+                    setCarregando(true);
                     await retirarSaldo(idMetaParaAdicionar, Number(valorRetirar));
                     const metasAtualizadas = await obterMetas();
                     setMetas(metasAtualizadas);
@@ -260,6 +267,8 @@ const Metas = () => {
               } catch (erro) {
                 console.error("Erro ao retirar saldo na meta:", erro);
                 throw erro;
+              } finally {
+                setCarregando(false);
               }
             }}
           />

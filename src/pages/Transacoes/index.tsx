@@ -327,6 +327,7 @@ const Transacoes = () => {
                             if (idTransacaoParaDeletar === null) return;
 
                             try {
+                                setCarregando(true);
                                 await deletarTransacao(idTransacaoParaDeletar);
 
                                 // RECARREGAR do backend
@@ -345,6 +346,8 @@ const Transacoes = () => {
                             } catch (erro) {
                                 console.error("Erro ao deletar:", erro);
                                 alert("Erro ao deletar a transação. Por favor, tente novamente.");
+                            } finally {
+                                setCarregando(false);
                             }
                         }}
                     />

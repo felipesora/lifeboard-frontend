@@ -39,7 +39,8 @@ const Conta = () => {
   useAuthRedirect();
   const navigate = useNavigate();
 
-  const [carregando, setCarregando] = useState<boolean>(true);
+  const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [nome, setNome] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [fotoPerfil, setFotoPerfil] = useState<string | null>(null);
@@ -55,7 +56,7 @@ const Conta = () => {
   useEffect(() => {
     const fetchDadosUsuario = async () => {
       try {
-        setCarregando(true);
+        setLoadingFetch(true);
         const id = localStorage.getItem("userId");
         if (!id) {
           throw new Error("ID do usuário não encontrado");
@@ -69,7 +70,7 @@ const Conta = () => {
       } catch (erro) {
         console.error("Erro ao obter dados do usuário:", erro);
       } finally {
-        setCarregando(false);
+        setLoadingFetch(false);
       }
     };
 
@@ -79,6 +80,8 @@ const Conta = () => {
   useEffect(() => {
     const fetchFotoPerfil = async () => {
       try {
+        setLoadingFetch(true);
+
         const blob = await obterFotoPerfil();
 
         if (blob instanceof Blob && blob.size > 0) {
@@ -90,6 +93,8 @@ const Conta = () => {
       } catch (error) {
         console.error("Erro ao carregar foto de perfil:", error);
         setFotoPerfil(FotoPefilPadrao);
+      } finally {
+        setLoadingFetch(false);
       }
     };
 
@@ -117,16 +122,20 @@ const Conta = () => {
     formData.append("file", file);
 
     try {
+      setLoadingFetch(true);
       await atualizarFotoPefil(formData);
       const novaImagem = URL.createObjectURL(file);
       setFotoPerfil(novaImagem);
     } catch (error) {
       console.error("Erro ao enviar imagem:", error);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
   const handleRemoverFoto = async () => {
     try {
+      setLoadingFetch(true);
       if (fotoPerfil && fotoPerfil.startsWith('blob:')) {
         URL.revokeObjectURL(fotoPerfil);
       }
@@ -135,11 +144,15 @@ const Conta = () => {
       setFotoPerfil(FotoPefilPadrao);
     } catch (error) {
       console.error("Erro ao remover foto: ", error);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
   const handleEditarConta = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setError('');
 
     if (!nomeEditar || !emailEditar || !senhaEditar || !senhaConfirmarEditar) {
       setError("Preencha todos os campos.");
@@ -166,6 +179,7 @@ const Conta = () => {
     };
 
     try {
+      setLoading(true);
       const id = localStorage.getItem("userId");
       if (!id) {
         throw new Error("ID do usuário não encontrado");
@@ -184,6 +198,8 @@ const Conta = () => {
       console.log(erro);
       setError("Erro ao editar os dados. Tente novamente.");
       setSuccess("");
+    } finally {
+      setLoading(true);
     }
   };
 
@@ -194,6 +210,7 @@ const Conta = () => {
     }
 
     try {
+      setLoadingFetch(true);
       const id = localStorage.getItem("userId");
       if (!id) {
         throw new Error("ID do usuário não encontrado");
@@ -205,6 +222,8 @@ const Conta = () => {
     } catch (error) {
       console.error("Erro ao deletar conta:", error);
       alert("Erro ao deletar conta. Tente novamente.");
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
@@ -214,9 +233,9 @@ const Conta = () => {
 
   return (
     <>
-      <LoadingTelaCheia carregando={carregando}/>
+      <LoadingTelaCheia carregando={loadingFetch}/>
 
-      <DashBoardContainer $carregando={carregando}>
+      <DashBoardContainer $carregando={loadingFetch}>
         <Cabecalho />
         <MenuLateral />
         <DashboardMainConta>
@@ -326,7 +345,7 @@ const Conta = () => {
                 </MensagensContainer>
 
                 <BotaoEditarConta>
-                  <BotaoSalvar type="submit">Salvar Alterações</BotaoSalvar>
+                  <BotaoSalvar type="submit" $loading={loading} disabled={loading}>{loading ? 'Salvando...' : 'Salvar Alterações'}</BotaoSalvar>
                 </BotaoEditarConta>
               </FormEditarConta>
             </ContainerEditarConta>

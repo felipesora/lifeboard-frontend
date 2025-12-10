@@ -15,7 +15,8 @@ import {
   MensagemSucesso,
   MensagemErro,
   BotoesContainer,
-  BotaoAcao
+  BotaoAcao,
+  CadastrarButton
 } from "./styles";
 
 import { useAuthRedirect } from "../../hooks/useAuthRedirect";
@@ -27,6 +28,7 @@ const CadastroMeta = () => {
   useAuthRedirect();
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [nomeMeta, setNomeMeta] = useState<string>('');
   const [dataLimiteMeta, setDataLimiteMeta] = useState<string>('');
   const [valorMeta, setValorMeta] = useState<string>('');
@@ -34,6 +36,8 @@ const CadastroMeta = () => {
   const [success, setSuccess] = useState<string>("");
 
   const handleCadastroMeta = async () => {
+    setError('');
+
     if (!nomeMeta.trim() || !dataLimiteMeta || !valorMeta) {
       setError("Preencha todos os campos.");
       setSuccess("");
@@ -73,6 +77,7 @@ const CadastroMeta = () => {
     };
 
     try {
+      setLoading(true);
       await cadastrarMeta(meta);
 
       setError("");
@@ -86,6 +91,8 @@ const CadastroMeta = () => {
       console.log(erro);
       setError("Erro ao cadastrar a meta. Tente novamente.");
       setSuccess("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,6 +118,7 @@ const CadastroMeta = () => {
                   required
                   value={nomeMeta}
                   onChange={(e) => setNomeMeta(e.target.value)}
+                  disabled={loading}
                 />
               </InputNomeMeta>
 
@@ -122,6 +130,7 @@ const CadastroMeta = () => {
                   name="dataLimite"
                   value={dataLimiteMeta}
                   onChange={(e) => setDataLimiteMeta(e.target.value)}
+                  disabled={loading}
                 />
               </InputDataLimite>
 
@@ -136,6 +145,7 @@ const CadastroMeta = () => {
                   required
                   value={valorMeta}
                   onChange={(e) => setValorMeta(e.target.value)}
+                  disabled={loading}
                 />
               </InputValorMeta>
             </InputsContainer>
@@ -149,9 +159,14 @@ const CadastroMeta = () => {
               <BotaoAcao type="button" onClick={() => navigate("/metas")}>
                 Cancelar
               </BotaoAcao>
-              <BotaoAcao type="button" onClick={handleCadastroMeta}>
-                Cadastrar Meta
-              </BotaoAcao>
+              <CadastrarButton 
+                type="button" 
+                onClick={handleCadastroMeta}
+                $loading={loading}
+                disabled={loading}
+              >
+                {loading ? 'Cadastrando...' : 'Cadastrar Meta'}
+              </CadastrarButton>
             </BotoesContainer>
           </CadastroMetasForm>
         </CadastroMetasContainer>

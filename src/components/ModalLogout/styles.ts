@@ -124,3 +124,33 @@ export const ConteudoModalLogout = styled.div`
         width: 320px;
     }
 `;
+
+export const SairButton = styled.button<{ $loading?: boolean }>`
+    background-color: var(--cor-principal);
+    padding: 7px 0;
+    width: 180px;
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+    border: none;
+    font-family: var(--fonte-principal);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin: 15px 0 0 0;
+    &:hover{
+        background-color: #455A64;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+    @media (max-width: 550px) {
+        width: 160px;
+    }
+    @media (max-width: 500px) {
+        width: 180px;
+    }
+  
+    ${props => props.$loading && `
+        opacity: 0.8;
+        cursor: wait;
+    `}
+`;

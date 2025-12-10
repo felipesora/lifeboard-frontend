@@ -320,6 +320,7 @@ const MinhasTarefas = () => {
             onDelete={async () => {
               try {
                   if (idTarefaParaDeletar != null) {
+                      setCarregando(true);
                       await deletarTarefa(idTarefaParaDeletar);
                       const tarefasAtualizadas = await obterTarefas();
                       setTarefas(tarefasAtualizadas);
@@ -329,6 +330,8 @@ const MinhasTarefas = () => {
               } catch (erro) {
                 console.error("Erro ao deletar tarefa:", erro);
                 alert("Erro ao deletar a tarefa. Por favor, tente novamente.");
+              } finally {
+                setCarregando(false);
               }
             }}
           />
