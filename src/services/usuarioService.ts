@@ -1,9 +1,10 @@
+import { API_URL } from "../config/api";
 import type { UsuarioEditRequest, UsuarioResponse } from "../types/usuario";
 
 export async function obterDadosUsuario(id: number): Promise<UsuarioResponse> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
+    const response = await fetch(`${API_URL}/api/usuarios/${id}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -26,7 +27,7 @@ export async function obterDadosUsuario(id: number): Promise<UsuarioResponse> {
 export async function editarDadosUsuario(idUsuario: number, novoUsuario: UsuarioEditRequest): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/usuarios/${idUsuario}`, {
+    const response = await fetch(`${API_URL}/api/usuarios/${idUsuario}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -49,7 +50,7 @@ export async function editarDadosUsuario(idUsuario: number, novoUsuario: Usuario
 export async function deletarUsuario(id: number): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
+    const response = await fetch(`${API_URL}/api/usuarios/${id}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -68,7 +69,7 @@ export async function obterFotoPerfil(): Promise<Blob> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
-    const response = await fetch(`http://localhost:8080/api/usuarios/${idUser}/foto`, {
+    const response = await fetch(`${API_URL}/api/usuarios/${idUser}/foto`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -88,7 +89,7 @@ export async function atualizarFotoPefil(formData: FormData): Promise<Blob> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
-    const response = await fetch(`http://localhost:8080/api/usuarios/${idUser}/foto`, {
+    const response = await fetch(`${API_URL}/api/usuarios/${idUser}/foto`, {
         method: 'PUT',
         body: formData,
         headers: {
@@ -108,7 +109,7 @@ export async function removerFotoPerfil(): Promise<void> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
-    const response = await fetch(`http://localhost:8080/api/usuarios/${idUser}/foto`, {
+    const response = await fetch(`${API_URL}/api/usuarios/${idUser}/foto`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,

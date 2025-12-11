@@ -1,10 +1,11 @@
+import { API_URL } from "../config/api";
 import type { TarefaCreateDTO, TarefaEditDTO, TarefaResponse } from "../types/tarefa";
 
 
 export async function obterDadosTarefa(id: number): Promise<TarefaResponse> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/tarefas/${id}`, {
+    const response = await fetch(`${API_URL}/api/tarefas/${id}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -21,7 +22,7 @@ export async function cadastrarTarefa(tarefa: TarefaCreateDTO): Promise<void> {
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
-    const response = await fetch('http://localhost:8080/api/tarefas', {
+    const response = await fetch(`${API_URL}/api/tarefas`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ export async function editarDadosTarefa(idTarefa: number, novaTarefa: TarefaEdit
     const token = localStorage.getItem('token');
     const idUser = localStorage.getItem('userId');
 
-    const response = await fetch(`http://localhost:8080/api/tarefas/${idTarefa}`, {
+    const response = await fetch(`${API_URL}/api/tarefas/${idTarefa}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -75,7 +76,7 @@ export async function editarDadosTarefa(idTarefa: number, novaTarefa: TarefaEdit
 export async function deletarTarefa(idTarefa: number): Promise<void> {
         const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/tarefas/${idTarefa}`, {
+    const response = await fetch(`${API_URL}/api/tarefas/${idTarefa}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,

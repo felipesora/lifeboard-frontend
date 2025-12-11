@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 import type { TransacaoCreateDTO, TransacaoRequest, TransacaoResponse } from "../types/transacao";
 import { obterDadosUsuario } from "./usuarioService";
 
@@ -5,7 +6,7 @@ import { obterDadosUsuario } from "./usuarioService";
 export async function obterDadosTransacao(id: number): Promise<TransacaoResponse> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/transacoes/${id}`, {
+    const response = await fetch(`${API_URL}/api/transacoes/${id}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -26,7 +27,7 @@ export async function cadastrarTransacao(transacao: TransacaoCreateDTO): Promise
 
     const idFinanceiro = usuario.financeiro.id_financeiro;
 
-    const response = await fetch('http://localhost:8080/api/transacoes', {
+    const response = await fetch(`${API_URL}/api/transacoes`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ export async function cadastrarTransacao(transacao: TransacaoCreateDTO): Promise
 export async function editarDadosTransacao(idTransacao: number, novaTransacao: TransacaoRequest): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/transacoes/${idTransacao}`, {
+    const response = await fetch(`${API_URL}/api/transacoes/${idTransacao}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -77,7 +78,7 @@ export async function editarDadosTransacao(idTransacao: number, novaTransacao: T
 export async function deletarTransacao(idTransacao: number): Promise<void> {
         const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/transacoes/${idTransacao}`, {
+    const response = await fetch(`${API_URL}/api/transacoes/${idTransacao}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,

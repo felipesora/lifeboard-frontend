@@ -1,7 +1,8 @@
+import { API_URL } from "../../../config/api";
 import type { RegisterRequest } from "../../../types/auth";
 
 export async function cadastro({ nome, email, senha }: RegisterRequest) {
-    const response = await fetch('http://localhost:8080/api/usuarios', {
+    const response = await fetch(`${API_URL}/api/usuarios`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

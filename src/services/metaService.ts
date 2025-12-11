@@ -1,10 +1,11 @@
+import { API_URL } from "../config/api";
 import type { MetaCreateDTO, MetaEditDTO, MetaResponse } from "../types/meta";
 import { obterDadosUsuario } from "./usuarioService";
 
 export async function obterDadosMeta(id: number): Promise<MetaResponse> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/metas/${id}`, {
+    const response = await fetch(`${API_URL}/api/metas/${id}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -25,7 +26,7 @@ export async function cadastrarMeta(meta: MetaCreateDTO): Promise<void> {
 
     const idFinanceiro = usuario.financeiro.id_financeiro;
 
-    const response = await fetch('http://localhost:8080/api/metas', {
+    const response = await fetch(`${API_URL}/api/metas`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -51,7 +52,7 @@ export async function cadastrarMeta(meta: MetaCreateDTO): Promise<void> {
 export async function adicionarSaldo(id: number, valor: number): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/metas/${id}/adicionar-saldo`, {
+    const response = await fetch(`${API_URL}/api/metas/${id}/adicionar-saldo`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -76,7 +77,7 @@ export async function adicionarSaldo(id: number, valor: number): Promise<void> {
 export async function retirarSaldo(id: number, valor: number): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/metas/${id}/retirar-saldo`, {
+    const response = await fetch(`${API_URL}/api/metas/${id}/retirar-saldo`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -101,7 +102,7 @@ export async function retirarSaldo(id: number, valor: number): Promise<void> {
 export async function editarDadosMeta(idMeta: number, novaMeta: MetaEditDTO): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/metas/${idMeta}`, {
+    const response = await fetch(`${API_URL}/api/metas/${idMeta}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -125,7 +126,7 @@ export async function editarDadosMeta(idMeta: number, novaMeta: MetaEditDTO): Pr
 export async function deletarMeta(idMeta: number): Promise<void> {
         const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/metas/${idMeta}`, {
+    const response = await fetch(`${API_URL}/api/metas/${idMeta}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,

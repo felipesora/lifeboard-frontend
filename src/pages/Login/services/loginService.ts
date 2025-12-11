@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import type { LoginResponse } from "../../../types/auth";
+import { API_URL } from "../../../config/api";
 
 interface JwtPayload {
   iss: string
@@ -9,7 +10,7 @@ interface JwtPayload {
 }
 
 export async function login(email: string, senha: string): Promise<string> {
-  const response = await fetch("http://localhost:8080/auth/login", {
+  const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, senha }),

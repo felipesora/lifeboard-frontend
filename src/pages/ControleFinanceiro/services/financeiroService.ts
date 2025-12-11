@@ -1,9 +1,10 @@
+import { API_URL } from "../../../config/api";
 import type { FinanceiroRequest } from "../../../types/financeiro";
 
 export async function editarFinanceiroUsuario(idFinanceiro: number, financeiro: FinanceiroRequest): Promise<void> {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://localhost:8080/api/financeiros/${idFinanceiro}`, {
+    const response = await fetch(`${API_URL}/api/financeiros/${idFinanceiro}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
