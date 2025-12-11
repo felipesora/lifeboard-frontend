@@ -310,6 +310,8 @@ export const Rodape = styled.footer`
     hr {
         height: 1px;
         background-color: #455a64;
+        border: none;
+        margin: 0;
     }
     .conteudo_rodape {
         padding: 40px 35px 20px 35px;
