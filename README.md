@@ -87,30 +87,6 @@ Aplicação disponível em:
 
 ---
 
-## 🚀 Deploy
-
-O LifeBoard está disponível publicamente em produção, permitindo acesso tanto à aplicação web quanto à API backend.
-
-### 🖥️ Aplicação Web (Frontend)
-
-A interface do LifeBoard pode ser acessada online pelo link abaixo:
-
-[https://lifeboard-frontend.vercel.app/](https://lifeboard-frontend.vercel.app/)
-
-### 🛠️ API REST (Backend)
-
-A API do LifeBoard está publicada e documentada para consumo externo:
-
-**Base URL da API**
-
-[https://lifeboard-backend-cv3r.onrender.com](https://lifeboard-backend-cv3r.onrender.com)
-
-**Swagger / OpenAPI**
-
-[https://lifeboard-backend-cv3r.onrender.com/swagger-ui/index.html](https://lifeboard-backend-cv3r.onrender.com/swagger-ui/index.html)
-
----
-
 ## 🔗 Repositórios Relacionados
 
 ### 📘 Documentação Geral do Projeto LifeBoard
